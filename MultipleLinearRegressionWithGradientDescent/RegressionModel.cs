@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Windows.Media;
 using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.Providers.LinearAlgebra;
 
 namespace MultipleLinearRegressionWithGradientDescent;
 
@@ -12,32 +16,82 @@ namespace MultipleLinearRegressionWithGradientDescent;
 //TODO: Regularization
 //TODO: Logistic Regression
 
+public class NormalMatrix
+{
+    public NormalMatrix(Matrix<double> original)
+    {
+        Original = original;
+        Normalize();
+    }
+
+    public MathNet.Numerics.LinearAlgebra.Vector<double> Mean { get; private set; }
+    public MathNet.Numerics.LinearAlgebra.Vector<double> Deviation { get; private set; }
+    public Matrix<double> Original { get; }
+    public Matrix<double> Normal { get; private set; }
+    
+    private void Normalize()
+    {
+        Deviation = MathNet.Numerics.LinearAlgebra.Vector<double>.Build.Dense(Original.ColumnCount);
+        Mean = MathNet.Numerics.LinearAlgebra.Vector<double>.Build.Dense(Original.ColumnCount);
+
+        Normal = Matrix<double>.Build.DenseOfColumns(Original.EnumerateColumns().Select((c, i) =>
+        {
+            var normal = Normalize(c, out double deviation, out double mean);
+            Deviation[i] = deviation;
+            Mean[i] = mean;
+            return normal;
+        }));
+    }
+
+    public MathNet.Numerics.LinearAlgebra.Vector<double> NormalizeRow(
+        MathNet.Numerics.LinearAlgebra.Vector<double> input)
+    {
+        return (input - Mean).PointwiseDivide(Deviation);
+    }
+
+    private MathNet.Numerics.LinearAlgebra.Vector<double> Normalize(MathNet.Numerics.LinearAlgebra.Vector<double> input, out double deviation, out double mean)
+    {
+        double deviationValue = deviation = StandardDeviation(input);
+        double meanValue = mean = input.Average();
+        return (input - meanValue).Divide(deviationValue);
+    }
+
+    private double StandardDeviation(MathNet.Numerics.LinearAlgebra.Vector<double> input)
+    {
+        double mean = input.Average();
+        double deviation = input.Sum(x => Math.Pow(x - mean, 2));
+        return deviation / input.Count;
+    }
+}
+
+
 public class RegressionModel
 {
     public RegressionModel()
     {
     }
 
-    public Vector<double> Weight { get; set; }
+    public MathNet.Numerics.LinearAlgebra.Vector<double> Weight { get; set; }
     public double Bias { get; set; }
-    public Matrix<double> TrainingInput { get; private set; }
-    public Vector<double> TrainingOutput { get; private set; }
-    public double LearningRate { get; set; } = 0.000001;
+    public Matrix<double> TrainingInput => NormalizedInput.Normal;
+    public NormalMatrix NormalizedInput { get; private set; }
+    public MathNet.Numerics.LinearAlgebra.Vector<double> TrainingOutput { get; private set; }
+    public double LearningRate { get; set; } = 0.1;
     public double TrainingThreshold { get; set; } = 3E2;
 
-    public IEnumerable<double> Fit(Matrix<double> trainingInput, Vector<double> trainingOutput)
+    public IEnumerable<double> Fit(Matrix<double> trainingInput, MathNet.Numerics.LinearAlgebra.Vector<double> trainingOutput)
     {
-        TrainingInput = trainingInput;
+        NormalizedInput = new NormalMatrix(trainingInput);
         TrainingOutput = trainingOutput;
-        Weight = Vector<double>.Build.Dense(trainingInput.ColumnCount);
+
+        Weight = MathNet.Numerics.LinearAlgebra.Vector<double>.Build.Dense(trainingInput.ColumnCount);
         Bias = 0;
 
         double lastCost = GradientStep();
         double cost = GradientStep();
-        double epsilon = 3E2;
 
         yield return cost;
-        while (Math.Abs(cost-lastCost) > epsilon)
+        while (Math.Abs(cost-lastCost) > TrainingThreshold)
         {
             lastCost = cost;
             cost = GradientStep();
@@ -54,30 +108,32 @@ public class RegressionModel
         return cost;
     }
 
-    private (Vector<double> WeightGradient, double BiasGradient) ComputeGradient(Vector<double> weight, double bias)
+    private (MathNet.Numerics.LinearAlgebra.Vector<double> WeightGradient, double BiasGradient) ComputeGradient(MathNet.Numerics.LinearAlgebra.Vector<double> weight, double bias)
     {
         var predictions = TrainingInput.Multiply(weight) + bias;
-        double GradientComponent(int featureIndex)
-        {
-            var featureValues = TrainingInput.Column(featureIndex);
-            return (predictions - TrainingOutput).DotProduct(featureValues) / predictions.Count;
-        }
+        var scaledPredictions = (predictions - TrainingOutput);
+        
+        var biasGradient = scaledPredictions.Sum() / predictions.Count;
 
-        var biasGradient = (predictions - TrainingOutput).Sum() / predictions.Count;
+        var weightGradient = TrainingInput.LeftMultiply(scaledPredictions).Divide(predictions.Count);
 
-        var weightGradient = Vector<double>.Build.DenseOfEnumerable(Enumerable.Range(0, weight.Count).Select(GradientComponent));
         return (weightGradient, biasGradient);
     }
 
-    private double ComputeCost(Vector<double> weight, double bias)
+    private double ComputeCost(MathNet.Numerics.LinearAlgebra.Vector<double> weight, double bias)
     {
-        double InstanceCost(Vector<double> rowData, int rowIndex) 
+        double InstanceCost(MathNet.Numerics.LinearAlgebra.Vector<double> rowData, int rowIndex) 
             => Math.Pow(ComputePrediction(rowData, weight, bias) - TrainingOutput[rowIndex], 2);
 
         return TrainingInput.EnumerateRows().Select(InstanceCost).Sum();
     }
 
-    public double ComputePrediction(Vector<double> input, Vector<double>? weight = null, double? bias = null)
+    public double Predict(MathNet.Numerics.LinearAlgebra.Vector<double> input)
+    {
+        return ComputePrediction(NormalizedInput.NormalizeRow(input), Weight, Bias);
+    }
+
+    private double ComputePrediction(MathNet.Numerics.LinearAlgebra.Vector<double> input, MathNet.Numerics.LinearAlgebra.Vector<double>? weight, double? bias)
     {
         weight ??= Weight;
         bias ??= Bias;

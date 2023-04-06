@@ -36,24 +36,27 @@ namespace MultipleLinearRegressionWithGradientDescent
 
         MathNet.Numerics.LinearAlgebra.Vector<double> inputY;
         Matrix<double> inputX;
+        public List<CarPriceRecord> Records { get; private set; }
 
         public MainWindow()
         {
             _model = new RegressionModel();
+            
+            using var streamReader = new StreamReader("car_prices.csv");
+            using var csvReader = new CsvHelper.CsvReader(streamReader, CultureInfo.InvariantCulture, false);
+            Records = csvReader.GetRecords<CarPriceRecord>().ToList();
+
             InitializeComponent();
         }
 
         private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
-            using var streamReader = new StreamReader("car_prices.csv");
-            using var csvReader = new CsvHelper.CsvReader(streamReader, CultureInfo.InvariantCulture, false);
-            var records = csvReader.GetRecords<CarPriceRecord>().ToList();
 
-            var doors = records.Select(x => x.DoorNumber).Distinct();
-            var cylinders = records.Select(x => x.CylinderNumber).Distinct();
+            var doors = Records.Select(x => x.DoorNumber).Distinct();
+            var cylinders = Records.Select(x => x.CylinderNumber).Distinct();
             
-            inputX = Matrix<double>.Build.DenseOfRowVectors(records.Select(x => MathNet.Numerics.LinearAlgebra.Vector<double>.Build.DenseOfArray(new [] { x.CylindersCount, x.CityMpg, x.HorsePower, x.WheelBase })).ToArray());
-            inputY = MathNet.Numerics.LinearAlgebra.Vector<double>.Build.DenseOfEnumerable(records.Select(x => x.Price));
+            inputX = Matrix<double>.Build.DenseOfRowVectors(Records.Select(x => MathNet.Numerics.LinearAlgebra.Vector<double>.Build.DenseOfArray(new [] { x.CylindersCount, x.CityMpg, x.HorsePower, x.WheelBase })).ToArray());
+            inputY = MathNet.Numerics.LinearAlgebra.Vector<double>.Build.DenseOfEnumerable(Records.Select(x => x.Price));
 
             ShowScatter(inputX, inputY.ToArray(), xLabel: "Cylinders",yLabel:"Price");
             ShowScatter(inputX, inputY.ToArray(), 1, xLabel: "CityMpg",yLabel:"Price");
@@ -112,12 +115,12 @@ namespace MultipleLinearRegressionWithGradientDescent
             var input = new[]
                 { double.Parse(tbCylinders.Text), double.Parse(tbCityMpg.Text), double.Parse(tbHorsePower.Text), double.Parse(tbWheelBase.Text) };
             double result =
-                _model.ComputePrediction(MathNet.Numerics.LinearAlgebra.Vector<double>.Build.DenseOfArray(input));
+                _model.Predict(MathNet.Numerics.LinearAlgebra.Vector<double>.Build.DenseOfArray(input));
             lbPrice.Content = result;
         }
     }
 
-    record CarPriceRecord(string DoorNumber, double CurbWeight, string CylinderNumber, double EngineSize,
+    public record CarPriceRecord(string DoorNumber, double CurbWeight, string CylinderNumber, double EngineSize,
         string FuelType, double WheelBase, double HorsePower, double CityMpg, double HighWayMpg, double Price)
     {
         public int DoorsCount => DoorNumber switch

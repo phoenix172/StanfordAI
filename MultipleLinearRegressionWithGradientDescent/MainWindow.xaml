@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MultipleLinearRegressionWithGradientDescent"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" Loaded="MainWindow_OnLoaded">
+        Title="MainWindow" Height="450" Width="800" Loaded="MainWindow_OnLoaded" Name="root">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
             <RowDefinition></RowDefinition>
@@ -20,13 +21,22 @@
         <WpfPlot Grid.Row="1" Name="costHistoryPlot"></WpfPlot>
         <UniformGrid Name="plots" Columns="2" Grid.Row="2">
         </UniformGrid>
-        <StackPanel Grid.Row="3">
-            <Label>Cylinders</Label><TextBox Name="tbCylinders"></TextBox>
-            <Label>CityMpg</Label><TextBox Name="tbCityMpg"></TextBox>
-            <Label>HorsePower</Label><TextBox Name="tbHorsePower"></TextBox>
-            <Label>WheelBase</Label><TextBox Name="tbWheelBase"></TextBox>
+        <StackPanel Grid.Row="3" DataContext="{Binding ElementName=inputGrid, Path=SelectedItem}">
+            <Label>Cylinders</Label><TextBox Name="tbCylinders" Text="{Binding CylindersCount, Mode=OneWay}"></TextBox>
+            <Label>CityMpg</Label><TextBox Name="tbCityMpg" Text="{Binding CityMpg,Mode=OneWay}"></TextBox>
+            <Label>HorsePower</Label><TextBox Name="tbHorsePower" Text="{Binding HorsePower, Mode=OneWay}"></TextBox>
+            <Label>WheelBase</Label><TextBox Name="tbWheelBase" Text="{Binding WheelBase, Mode=OneWay}"></TextBox>
             <Label>Price</Label><Label Name="lbPrice"></Label>
             <Button Click="PredictClick">Predict</Button>
         </StackPanel>
+        <DataGrid Grid.Row="4" ItemsSource="{Binding ElementName=root, Path=Records}" AutoGenerateColumns="False" Name="inputGrid">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding CylindersCount}" Header="Cylinders"/>
+                <DataGridTextColumn Binding="{Binding CityMpg}" Header="CityMpg"/>
+                <DataGridTextColumn Binding="{Binding HorsePower}" Header="HorsePower"/>
+                <DataGridTextColumn Binding="{Binding WheelBase}" Header="WheelBase"/>
+                <DataGridTextColumn Binding="{Binding Price}" Header="Price"/>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Window>
