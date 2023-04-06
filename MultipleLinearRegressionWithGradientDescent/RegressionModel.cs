@@ -122,10 +122,9 @@ public class RegressionModel
 
     private double ComputeCost(MathNet.Numerics.LinearAlgebra.Vector<double> weight, double bias)
     {
-        double InstanceCost(MathNet.Numerics.LinearAlgebra.Vector<double> rowData, int rowIndex) 
-            => Math.Pow(ComputePrediction(rowData, weight, bias) - TrainingOutput[rowIndex], 2);
-
-        return TrainingInput.EnumerateRows().Select(InstanceCost).Sum();
+        var predictions = TrainingInput.Multiply(weight) + bias;
+        var sqrtError = (predictions - TrainingOutput);
+        return sqrtError.DotProduct(sqrtError);
     }
 
     public double Predict(MathNet.Numerics.LinearAlgebra.Vector<double> input)

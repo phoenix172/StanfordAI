@@ -22,6 +22,7 @@ using System.Windows.Shapes;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Complex;
 using ScottPlot;
+using ScottPlot.Plottable;
 using ScottPlot.Renderable;
 using Vector = System.Numerics.Vector;
 
@@ -41,7 +42,7 @@ namespace MultipleLinearRegressionWithGradientDescent
         public MainWindow()
         {
             _model = new RegressionModel();
-            
+
             using var streamReader = new StreamReader("car_prices.csv");
             using var csvReader = new CsvHelper.CsvReader(streamReader, CultureInfo.InvariantCulture, false);
             Records = csvReader.GetRecords<CarPriceRecord>().ToList();
@@ -54,17 +55,17 @@ namespace MultipleLinearRegressionWithGradientDescent
 
             var doors = Records.Select(x => x.DoorNumber).Distinct();
             var cylinders = Records.Select(x => x.CylinderNumber).Distinct();
-            
-            inputX = Matrix<double>.Build.DenseOfRowVectors(Records.Select(x => MathNet.Numerics.LinearAlgebra.Vector<double>.Build.DenseOfArray(new [] { x.CylindersCount, x.CityMpg, x.HorsePower, x.WheelBase })).ToArray());
+
+            inputX = Matrix<double>.Build.DenseOfRowVectors(Records.Select(x => MathNet.Numerics.LinearAlgebra.Vector<double>.Build.DenseOfArray(new[] { x.CylindersCount, x.CityMpg, x.HorsePower, x.WheelBase })).ToArray());
             inputY = MathNet.Numerics.LinearAlgebra.Vector<double>.Build.DenseOfEnumerable(Records.Select(x => x.Price));
 
-            ShowScatter(inputX, inputY.ToArray(), xLabel: "Cylinders",yLabel:"Price");
-            ShowScatter(inputX, inputY.ToArray(), 1, xLabel: "CityMpg",yLabel:"Price");
-            ShowScatter(inputX, inputY.ToArray(), 2, xLabel: "HorsePower",yLabel:"Price");
-            ShowScatter(inputX, inputY.ToArray(), 3, xLabel: "WheelBase",yLabel:"Price");
+            ShowScatter(inputX, inputY.ToArray(), xLabel: "Cylinders", yLabel: "Price");
+            ShowScatter(inputX, inputY.ToArray(), 1, xLabel: "CityMpg", yLabel: "Price");
+            ShowScatter(inputX, inputY.ToArray(), 2, xLabel: "HorsePower", yLabel: "Price");
+            ShowScatter(inputX, inputY.ToArray(), 3, xLabel: "WheelBase", yLabel: "Price");
         }
 
-        private void ShowScatter(Matrix<double> inputX, double[] inputY, int columnIndex=0, string xLabel="", string yLabel="")
+        private void ShowScatter(Matrix<double> inputX, double[] inputY, int columnIndex = 0, string xLabel = "", string yLabel = "")
         {
             var plot = new WpfPlot();
             var xNormalized = Normalize(inputX.Column(columnIndex).ToArray());
@@ -89,25 +90,33 @@ namespace MultipleLinearRegressionWithGradientDescent
             double deviation = input.Sum(x => Math.Pow(x - mean, 2));
             return deviation / input.Length;
         }
-        
+
 
         private ObservableCollection<double> CostHistory { get; } = new ObservableCollection<double>();
-        private void GradientDescent_Click(object sender, RoutedEventArgs e)
+        private async void GradientDescent_Click(object sender, RoutedEventArgs e)
         {
-            var costs = _model.Fit(inputX, inputY).Select((x,i) =>
+            var cost = await Task.Run(() =>
             {
-                if(i%10000==0)
-                    Debug.WriteLine($"iteration {i}: cost {x}" );
-                return x;
-            }).ToList();
 
-            costHistoryPlot.Plot.Frameless(false);
-            costHistoryPlot.Plot.AddSignalXY(Enumerable.Range(0, costs.Count).Select(x=>(double)x).ToArray(), costs.ToArray());
-            //parametersDisplay.Content = string.Join(",", output) + $" Cost: {cost}";
-            costHistoryPlot.Refresh();
+                costHistoryPlot.Plot.Frameless(false);
+                var costList = costHistoryPlot.Plot.AddScatterList(markerSize:1.5f, lineStyle:LineStyle.Solid, lineWidth:0.5f, markerShape: MarkerShape.none);
+                int chunkSize = 1000;
+                var costs = _model.Fit(inputX, inputY).Chunk(chunkSize)
+                    .Select((x, i) =>
+                    {
+                        var costs = x.ToList();
+                        Debug.WriteLine($"iteration {i}: cost {x.Last()}");
+                        costList.AddRange(Enumerable.Range(chunkSize * i, costs.Count).Select(y => (double)y).ToArray(),
+                            costs.ToArray());
+                        Dispatcher.Invoke(()=>costHistoryPlot.RenderRequest());
+                        return x;
+                    }).ToList();
+                return costs.Last();
+            });
+            
 
             parametersDisplay.Content = ("Model converged at parameters: " + string.Join(",", _model.Weight) +
-                            $",{_model.Bias} with Cost: {costs.Last()}");
+                                         $",{_model.Bias} with Cost: {cost}");
         }
 
         private void PredictClick(object sender, RoutedEventArgs e)
@@ -127,7 +136,7 @@ namespace MultipleLinearRegressionWithGradientDescent
         {
             "two" => 2,
             "four" => 4,
-            _=>-1
+            _ => -1
         };
 
         public int CylindersCount => CylinderNumber switch
