@@ -29,46 +29,38 @@ using Vector = System.Numerics.Vector;
 namespace MultipleLinearRegressionWithGradientDescent
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for LinearRegression.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class LinearRegression : Window
     {
-        private RegressionModel _model;
+        private readonly RegressionModel _model;
+        MathNet.Numerics.LinearAlgebra.Vector<double> _inputY;
+        Matrix<double> _inputX;
 
-        MathNet.Numerics.LinearAlgebra.Vector<double> inputY;
-        Matrix<double> inputX;
         public List<CarPriceRecord> Records { get; private set; }
 
-        public MainWindow()
+        public LinearRegression()
         {
             _model = new RegressionModel();
 
             using var streamReader = new StreamReader("car_prices.csv");
             using var csvReader = new CsvHelper.CsvReader(streamReader, CultureInfo.InvariantCulture, false);
             Records = csvReader.GetRecords<CarPriceRecord>().ToList();
+            
+            _inputX = Matrix<double>.Build.DenseOfRowVectors(Records.Select(x => MathNet.Numerics.LinearAlgebra.Vector<double>.Build.DenseOfArray(new[] { x.CylindersCount, x.CityMpg, x.HorsePower, x.WheelBase })).ToArray());
+            _inputY = MathNet.Numerics.LinearAlgebra.Vector<double>.Build.DenseOfEnumerable(Records.Select(x => x.Price));
 
             InitializeComponent();
         }
 
         private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
-
-            var doors = Records.Select(x => x.DoorNumber).Distinct();
-            var cylinders = Records.Select(x => x.CylinderNumber).Distinct();
-
-            inputX = Matrix<double>.Build.DenseOfRowVectors(Records.Select(x => MathNet.Numerics.LinearAlgebra.Vector<double>.Build.DenseOfArray(new[] { x.CylindersCount, x.CityMpg, x.HorsePower, x.WheelBase })).ToArray());
-            inputY = MathNet.Numerics.LinearAlgebra.Vector<double>.Build.DenseOfEnumerable(Records.Select(x => x.Price));
-
-            ShowScatter(inputX, inputY.ToArray(), xLabel: "Cylinders", yLabel: "Price");
-            ShowScatter(inputX, inputY.ToArray(), 1, xLabel: "CityMpg", yLabel: "Price");
-            ShowScatter(inputX, inputY.ToArray(), 2, xLabel: "HorsePower", yLabel: "Price");
-            ShowScatter(inputX, inputY.ToArray(), 3, xLabel: "WheelBase", yLabel: "Price");
         }
 
-        private void ShowScatter(Matrix<double> inputX, double[] inputY, int columnIndex = 0, string xLabel = "", string yLabel = "")
+        private void ShowScatter(double[] inputY, int columnIndex = 0, string xLabel = "", string yLabel = "")
         {
             var plot = new WpfPlot();
-            var xNormalized = Normalize(inputX.Column(columnIndex).ToArray());
+            var xNormalized = _model.TrainingInput.Column(columnIndex).ToArray();
             plot.Plot.AddScatter(xNormalized, inputY.Select(x => (double)x).ToArray(),
                 lineStyle: LineStyle.None);
             plot.Plot.XLabel(xLabel);
@@ -77,46 +69,21 @@ namespace MultipleLinearRegressionWithGradientDescent
             plot.Refresh();
         }
 
-        private double[] Normalize(double[] input)
-        {
-            double deviation = StandardDeviation(input);
-            double mean = input.Average();
-            return input.Select(x => (x - mean) / deviation).ToArray();
-        }
-
-        private double StandardDeviation(double[] input)
-        {
-            double mean = input.Average();
-            double deviation = input.Sum(x => Math.Pow(x - mean, 2));
-            return deviation / input.Length;
-        }
-
-
-        private ObservableCollection<double> CostHistory { get; } = new ObservableCollection<double>();
         private async void GradientDescent_Click(object sender, RoutedEventArgs e)
         {
-            var cost = await Task.Run(() =>
-            {
-
-                costHistoryPlot.Plot.Frameless(false);
-                var costList = costHistoryPlot.Plot.AddScatterList(markerSize:1.5f, lineStyle:LineStyle.Solid, lineWidth:0.5f, markerShape: MarkerShape.none);
-                int chunkSize = 1000;
-                var costs = _model.Fit(inputX, inputY).Chunk(chunkSize)
-                    .Select((x, i) =>
-                    {
-                        var costs = x.ToList();
-                        Debug.WriteLine($"iteration {i}: cost {x.Last()}");
-                        costList.AddRange(Enumerable.Range(chunkSize * i, costs.Count).Select(y => (double)y).ToArray(),
-                            costs.ToArray());
-                        Dispatcher.Invoke(()=>costHistoryPlot.RenderRequest());
-                        return x;
-                    }).ToList();
-                return costs.Last();
-            });
-            
+            _model.LearningRate = 1;
+            _model.TrainingThreshold = 3E2;
+            var cost = await _model.FitAndPlot(costHistoryPlot, _inputX, _inputY);
 
             parametersDisplay.Content = ("Model converged at parameters: " + string.Join(",", _model.Weight) +
                                          $",{_model.Bias} with Cost: {cost}");
+
+
+            ShowScatter(_inputY.ToArray(), xLabel: "Cylinders", yLabel: "Price");
+            ShowScatter(_inputY.ToArray(), 1, xLabel: "CityMpg", yLabel: "Price");
+            ShowScatter(_inputY.ToArray(), 2, xLabel: "HorsePower", yLabel: "Price");
+            ShowScatter(_inputY.ToArray(), 3, xLabel: "WheelBase", yLabel: "Price");
+
         }
 
         private void PredictClick(object sender, RoutedEventArgs e)
@@ -126,6 +93,12 @@ namespace MultipleLinearRegressionWithGradientDescent
             double result =
                 _model.Predict(MathNet.Numerics.LinearAlgebra.Vector<double>.Build.DenseOfArray(input));
             lbPrice.Content = result;
+        }
+
+        private void LogisticalRegression_Click(object sender, RoutedEventArgs e)
+        {
+            LogisticalLinearRegression a = new LogisticalLinearRegression();
+            a.Show();
         }
     }
 

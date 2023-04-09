@@ -1,11 +1,11 @@
-﻿<Window x:Class="MultipleLinearRegressionWithGradientDescent.MainWindow"
+﻿<Window x:Class="MultipleLinearRegressionWithGradientDescent.LinearRegression"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MultipleLinearRegressionWithGradientDescent"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" Loaded="MainWindow_OnLoaded" Name="root">
+        Title="LinearRegression" Height="450" Width="800" Loaded="MainWindow_OnLoaded" Name="root">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -16,6 +16,7 @@
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" Grid.Row="0">
             <Button Click="GradientDescent_Click">Gradient Descent</Button>
+            <Button Click="LogisticalRegression_Click">Logistical Regression</Button>
             <Label Name="parametersDisplay"></Label>
         </StackPanel>
         <WpfPlot Grid.Row="1" Name="costHistoryPlot"></WpfPlot>

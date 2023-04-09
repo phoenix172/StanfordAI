@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Media.Media3D;
 using MathNet.Numerics.LinearAlgebra;
 
 namespace MultipleLinearRegressionWithGradientDescent;
 
 //TODO: Feature Scaling
-//TODO: Proper Normalization
 //TODO: Regularization
 //TODO: Logistic Regression
 
@@ -50,7 +50,7 @@ public class RegressionModel
 
     private (Vector<double> WeightGradient, double BiasGradient) ComputeGradient(Vector<double> weight, double bias)
     {
-        var predictions = TrainingInput.Multiply(weight) + bias;
+        var predictions = ComputePrediction(TrainingInput, weight, bias);
         var scaledPredictions = (predictions - TrainingOutput);
         
         var biasGradient = scaledPredictions.Sum() / predictions.Count;
@@ -60,22 +60,23 @@ public class RegressionModel
         return (weightGradient, biasGradient);
     }
 
-    private double ComputeCost(Vector<double> weight, double bias)
+    public double Predict(Vector<double> input) 
+        => ComputePrediction(NormalizedInput.NormalizeRow(input), Weight, Bias);
+
+    protected virtual double ComputeCost(Vector<double> weight, double bias)
     {
-        var predictions = TrainingInput.Multiply(weight) + bias;
+        var predictions = ComputePrediction(TrainingInput, weight, bias);
         var sqrtError = (predictions - TrainingOutput);
         return sqrtError.DotProduct(sqrtError);
     }
 
-    public double Predict(Vector<double> input)
+    protected virtual Vector<double> ComputePrediction(Matrix<double> input, Vector<double> weight, double bias)
     {
-        return ComputePrediction(NormalizedInput.NormalizeRow(input), Weight, Bias);
+        return input.Multiply(weight) + bias;
     }
 
-    private double ComputePrediction(Vector<double> input, Vector<double>? weight, double? bias)
+    protected virtual double ComputePrediction(Vector<double> input, Vector<double> weight, double bias)
     {
-        weight ??= Weight;
-        bias ??= Bias;
-        return input.DotProduct(weight)+bias.Value;
+        return input.DotProduct(weight)+bias;
     }
 }
