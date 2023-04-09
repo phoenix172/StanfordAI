@@ -20,6 +20,7 @@ public class RegressionModel
     public Vector<double> TrainingOutput { get; private set; }
     public double LearningRate { get; set; } = 1;
     public double TrainingThreshold { get; set; } = 3E2;
+    public double RegularizationTerm { get; set; } = 0;
 
     public Func<Vector<double>, Vector<double>> FeatureMap { get; set; } = x => x;
 
@@ -71,7 +72,7 @@ public class RegressionModel
         var (weightGradient, biasGradient) = ComputeGradient(Weight, Bias);
         Weight -= LearningRate * weightGradient;
         Bias -= LearningRate * biasGradient;
-        var cost = ComputeCost(Weight, Bias);
+        var cost = ComputeCost(Weight, Bias) + CostRegularizationTerm(Weight);
         return cost;
     }
 
@@ -82,7 +83,7 @@ public class RegressionModel
         
         var biasGradient = scaledPredictions.Sum() / predictions.Count;
 
-        var weightGradient = TrainingInput.LeftMultiply(scaledPredictions).Divide(predictions.Count);
+        var weightGradient = TrainingInput.LeftMultiply(scaledPredictions).Divide(predictions.Count) + GradientRegularizationTerm(weight);
 
         return (weightGradient, biasGradient);
     }
@@ -91,8 +92,14 @@ public class RegressionModel
     {
         var predictions = ComputePrediction(TrainingInput, weight, bias);
         var sqrtError = (predictions - TrainingOutput);
-        return sqrtError.DotProduct(sqrtError);
+        return sqrtError.DotProduct(sqrtError) / TrainingInput.RowCount;
     }
+
+    private Vector<double> GradientRegularizationTerm(Vector<double> weight)
+        => (RegularizationTerm / TrainingInput.RowCount) * weight;
+
+    private double CostRegularizationTerm(Vector<double> weight)
+        => (RegularizationTerm / (2 * TrainingInput.RowCount)) * weight.PointwisePower(2).Sum();
 
     protected virtual Vector<double> ComputePrediction(Matrix<double> input, Vector<double> weight, double bias)
     {

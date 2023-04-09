@@ -52,8 +52,9 @@ namespace MultipleLinearRegressionWithGradientDescent
             {
                 dataFile = "ex2data2.txt";
                 _model.TrainingThreshold = 1e-7;
-                _model.LearningRate = 1e-3;
+                _model.LearningRate = 1e-5;
             }
+            _model.RegularizationTerm = 1000;
             _model.FeatureMap = RegressionModel.MapFeatureDegree(12);
 
             var valuesArray = File.ReadAllLines(dataFile).Select(x => x.Split(',').Select(double.Parse).ToArray()).ToArray();
