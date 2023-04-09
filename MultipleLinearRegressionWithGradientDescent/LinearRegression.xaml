@@ -16,7 +16,8 @@
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" Grid.Row="0">
             <Button Click="GradientDescent_Click">Gradient Descent</Button>
-            <Button Click="LogisticalRegression_Click">Logistical Regression</Button>
+            <Button Click="LogisticalRegression_Click">Logistical Regression (1)</Button>
+            <Button Click="LogisticalRegression2_Click">Logistical Regression (2)</Button>
             <Label Name="parametersDisplay"></Label>
         </StackPanel>
         <WpfPlot Grid.Row="1" Name="costHistoryPlot"></WpfPlot>

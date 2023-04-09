@@ -14,7 +14,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Button Click="Descent_Glick">Descent</Button>
+        <Button Click="Descent_Click">Descent</Button>
         <WpfPlot Name="DataPlot" Grid.Row="1"/>
         <WpfPlot Name="CostPlot" Grid.Row="2"/>
         

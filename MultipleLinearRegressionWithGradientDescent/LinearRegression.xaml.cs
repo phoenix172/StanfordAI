@@ -97,7 +97,13 @@ namespace MultipleLinearRegressionWithGradientDescent
 
         private void LogisticalRegression_Click(object sender, RoutedEventArgs e)
         {
-            LogisticalLinearRegression a = new LogisticalLinearRegression();
+            LogisticalLinearRegression a = new LogisticalLinearRegression(1);
+            a.Show();
+        }
+
+        private void LogisticalRegression2_Click(object sender, RoutedEventArgs e)
+        {
+            LogisticalLinearRegression a = new LogisticalLinearRegression(2);
             a.Show();
         }
     }

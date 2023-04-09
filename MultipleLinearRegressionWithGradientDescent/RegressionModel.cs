@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Media.Media3D;
 using MathNet.Numerics.LinearAlgebra;
 
@@ -14,17 +15,40 @@ public class RegressionModel
     public Vector<double> Weight { get; set; }
     public double Bias { get; set; }
     public Matrix<double> TrainingInput => NormalizedInput.Normal;
+    public Matrix<double> OriginalTrainingInput { get; private set; }
     public NormalMatrix NormalizedInput { get; private set; }
     public Vector<double> TrainingOutput { get; private set; }
     public double LearningRate { get; set; } = 1;
     public double TrainingThreshold { get; set; } = 3E2;
 
+    public Func<Vector<double>, Vector<double>> FeatureMap { get; set; } = x => x;
+
+    public double Predict(Vector<double> input) 
+        => ComputePrediction(NormalizedInput.NormalizeRow(FeatureMap(input)), Weight, Bias);
+
+    public static Func<Vector<double>, Vector<double>> MapFeatureDegree(int degree) => input =>
+    {
+        IEnumerable<double> EnumerateFeatures()
+        {
+            for (int i = 1; i <= degree; i++)
+            {
+                for (int j = 0; j <= i; j++)
+                {
+                    yield return Math.Pow(input[0], i - j) * Math.Pow(input[1], j);
+                }
+            }
+        }
+
+        return Vector<double>.Build.DenseOfEnumerable(EnumerateFeatures());
+    };
+
     public IEnumerable<double> Fit(Matrix<double> trainingInput, Vector<double> trainingOutput)
     {
-        NormalizedInput = new NormalMatrix(trainingInput);
+        OriginalTrainingInput = trainingInput;
+        NormalizedInput = new NormalMatrix(FeatureMapMatrix(trainingInput));
         TrainingOutput = trainingOutput;
 
-        Weight = Vector<double>.Build.Dense(trainingInput.ColumnCount);
+        Weight = Vector<double>.Build.Dense(TrainingInput.ColumnCount);
         Bias = 0;
 
         double lastCost = GradientStep();
@@ -38,6 +62,9 @@ public class RegressionModel
             yield return cost;
         }
     }
+
+    private Matrix<double> FeatureMapMatrix(Matrix<double> input) 
+        => Matrix<double>.Build.DenseOfRows(input.EnumerateRows().Select(FeatureMap));
 
     private double GradientStep()
     {
@@ -59,9 +86,6 @@ public class RegressionModel
 
         return (weightGradient, biasGradient);
     }
-
-    public double Predict(Vector<double> input) 
-        => ComputePrediction(NormalizedInput.NormalizeRow(input), Weight, Bias);
 
     protected virtual double ComputeCost(Vector<double> weight, double bias)
     {
