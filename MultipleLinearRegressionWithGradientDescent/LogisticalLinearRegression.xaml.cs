@@ -31,8 +31,6 @@ namespace MultipleLinearRegressionWithGradientDescent
     /// </summary>
     public partial class LogisticalLinearRegression : Window
     {
-
-
         private readonly LogisticalRegressionModel _model;
         public List<DataItem> Records { get; private set; }
         private readonly Matrix<double> _inputX;
