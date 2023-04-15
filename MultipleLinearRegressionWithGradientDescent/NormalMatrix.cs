@@ -31,8 +31,8 @@ public class NormalMatrix
         }));
     }
 
-    public MathNet.Numerics.LinearAlgebra.Vector<double> NormalizeRow(
-        MathNet.Numerics.LinearAlgebra.Vector<double> input)
+    public Vector<double> NormalizeRow(
+        Vector<double> input)
     {
         return (input - Mean).PointwiseDivide(Deviation);
     }

@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Windows.Media.Media3D;
 using MathNet.Numerics.LinearAlgebra;
 
@@ -24,6 +27,52 @@ public class RegressionModel
 
     public double Predict(Vector<double> input) 
         => ComputePrediction(NormalizedInput.NormalizeRow(FeatureMap(input)), Weight, Bias);
+
+    public string GetModelEquation(int decimalPlaces = 5)
+    {
+        string funcStr;
+        if (OriginalTrainingInput.ColumnCount==1)
+        {
+            int degree = TrainingInput.ColumnCount;
+            string[] variables = new[] { "x" }.Concat(Enumerable.Range(2, degree - 1).Select(x => "x^" + x)).ToArray();
+
+            funcStr = string.Join("+",
+                variables.Zip(Weight.Select(x=>double.Round(x, decimalPlaces))).Select(x => x.First + "*" + x.Second)) + "+" + Bias;
+
+            return funcStr;
+        }
+
+        throw new NotImplementedException();
+    }
+
+    public string GetNormalizationEquation(int featureIndex, int decimalPlaces = 5)
+    {
+        return $"(x_{featureIndex} - {double.Round(NormalizedInput.Mean[featureIndex], decimalPlaces)})/{double.Round(NormalizedInput.Deviation[featureIndex],decimalPlaces)}";
+    }
+
+    //x*14.375091062986135+x^2*22.112854084327648+x^3*36.05371065910582+x^4*50.29443085140673+x^5*49.75632603888832+x^6*12.084475937412718+186.79686666537364
+    //(x_0 - 159534034100018)/241860085626095.12
+
+    public Expression<Func<double, double>> GetModelExpression()
+    {
+        if (OriginalTrainingInput.ColumnCount != 1) throw new NotImplementedException();
+        var param = Expression.Parameter(typeof(double), "x");
+        int degree = TrainingInput.ColumnCount;
+
+        Expression NormalParamDegree(double degree)
+        {
+            BinaryExpression normalParam = Expression.Divide(Expression.Subtract(param, Expression.Constant(NormalizedInput.Mean[0])), Expression.Constant(NormalizedInput.Deviation[0]));
+            var pesho = typeof(Math).GetMethod(nameof(Math.Pow), BindingFlags.Static | BindingFlags.Public);
+            var expression = Expression.Call(null, pesho, new Expression[] {normalParam, Expression.Constant(degree)});
+            return expression;
+            //return Expression.Power(normalParam, Expression.Constant(degree));
+        }
+
+        var terms = Weight.Select((d,i) => Expression.Multiply(NormalParamDegree(i+1), Expression.Constant(d)))
+            .Aggregate(Expression.Add);
+        var modelEquation = Expression.Add(terms, Expression.Constant(Bias));
+        return Expression.Lambda<Func<double, double>>(modelEquation, param);
+    }
 
     public static Func<Vector<double>, Vector<double>> MapFeatureDegree(int degree) => input =>
     {
@@ -60,30 +109,34 @@ public class RegressionModel
         Weight = Vector<double>.Build.Dense(TrainingInput.ColumnCount);
         Bias = 0;
 
-        Range range = 0..trainingInput.RowCount;
-        if (BatchSize > 0) 
-            range = 0..BatchSize;
-
-        double lastCost = GradientStep(range);
-        double cost = GradientStep(range);
+        double lastCost = GradientStep();
+        double cost = GradientStep();
 
         yield return cost;
-        while (Math.Abs(cost-lastCost) > TrainingThreshold)
+        while (Math.Abs(cost-lastCost)/lastCost > TrainingThreshold)
         {
             lastCost = cost;
-            cost = GradientStep(range);
-            if(BatchSize > 0)
-                range = range.End..Math.Min(range.End.Value+BatchSize, TrainingInput.RowCount);
-
-            if (range.Start.Value == range.End.Value)
-                range = 0..BatchSize;
-
+            cost = GradientStep();
             yield return cost;
         }
     }
 
     private Matrix<double> FeatureMapMatrix(Matrix<double> input) 
         => Matrix<double>.Build.DenseOfRows(input.EnumerateRows().Select(FeatureMap));
+
+    private double GradientStep()
+    {
+        if (BatchSize <= 0) return GradientStep(0..TrainingInput.RowCount);
+
+        double cost = 0;
+        int batch = 0;
+        for (; batch < TrainingInput.RowCount/BatchSize; batch++)
+        {
+            cost += GradientStep((batch * BatchSize)..Math.Min((batch * BatchSize + BatchSize - 1), TrainingInput.RowCount));
+        }
+
+        return cost;
+    }
 
     private double GradientStep(Range range)
     {
