@@ -55,6 +55,7 @@ namespace MultipleLinearRegressionWithGradientDescent
 
         private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
+            LogisticalRegression3_Click(this, new RoutedEventArgs());
         }
 
         private void ShowScatter(double[] inputY, int columnIndex = 0, string xLabel = "", string yLabel = "")
@@ -104,6 +105,12 @@ namespace MultipleLinearRegressionWithGradientDescent
         private void LogisticalRegression2_Click(object sender, RoutedEventArgs e)
         {
             LogisticalLinearRegression a = new LogisticalLinearRegression(2);
+            a.Show();
+        }
+
+        private void LogisticalRegression3_Click(object sender, RoutedEventArgs e)
+        {
+            GenericLinearRegression a = new GenericLinearRegression();
             a.Show();
         }
     }

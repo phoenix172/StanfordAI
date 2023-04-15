@@ -47,7 +47,7 @@ public class NormalMatrix
     private double StandardDeviation(MathNet.Numerics.LinearAlgebra.Vector<double> input)
     {
         double mean = input.Average();
-        double deviation = input.Sum(x => Math.Pow(x - mean, 2));
-        return deviation / input.Count;
+        double variance = input.Sum(x => Math.Pow(x - mean, 2)) / input.Count;
+        return Math.Sqrt(variance);
     }
 }

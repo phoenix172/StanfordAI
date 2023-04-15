@@ -17,6 +17,12 @@
     <None Update="car_prices.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Data\test.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\primary.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="ex2data1.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

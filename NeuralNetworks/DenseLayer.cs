@@ -12,9 +12,9 @@ public class DenseLayer
     public int InputSize { get; }
     public int Units { get; }
     public Func<Matrix<double>, Matrix<double>> ActivationFunction { get; }
-    public Matrix<double> Weight { get; }
-    public Vector<double> Bias { get; }
-
+    public Matrix<double> Weight { get; private set; }
+    public Vector<double> Bias { get; private set; }
+    public Matrix<double> Activations { get; private set; }
 
     public DenseLayer(int inputSize, int units, Func<Matrix<double>, Matrix<double>> activationFunction)
     {
@@ -28,8 +28,14 @@ public class DenseLayer
 
     public Matrix<double> ForwardPropagate(Matrix<double> input)
     {
-        var biasMatrix = Matrix<double>.Build.DenseOfColumns(Enumerable.Repeat(Bias, Units));
-        return ActivationFunction(input.Multiply(Weight).Add(biasMatrix));
+        var biasMatrix = Matrix<double>.Build.DenseOfRows(Enumerable.Repeat(Bias, input.RowCount));
+        return Activations = ActivationFunction(input.Multiply(Weight).Add(biasMatrix));
     }
 
+    public Matrix<double> BackPropagate(Matrix<double> outputDerivative, double learningRate)
+    {
+        var derivative = Activations.PointwiseMultiply(outputDerivative);
+        //Weight -=  derivative.ColumnSums().Divide(derivative.RowCount).Multiply(learningRate);
+        return derivative;
+    }
 }

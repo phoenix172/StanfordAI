@@ -12,13 +12,16 @@ public class LogisticalRegressionModel : RegressionModel
     protected override double ComputePrediction(Vector<double> input, Vector<double> weight, double bias) 
         => Sigmoid(input.DotProduct(weight) + bias);
 
-    protected override double ComputeCost(Vector<double> weight, double bias)
+    protected override double ComputeCost(Vector<double> weight, double bias, Matrix<double>? input=null, Vector<double>? output = null)
     {
-        var predictions = ComputePrediction(TrainingInput, weight, bias);
-        var inverseTrainingOutput = TrainingOutput * -1;
+        input ??= TrainingInput;
+        output ??= TrainingOutput;
+
+        var predictions = ComputePrediction(input, weight, bias);
+        var inverseTrainingOutput = output * -1;
         var positiveComponent = inverseTrainingOutput.PointwiseMultiply(predictions.PointwiseLog());
         var negativeComponent = (1 + inverseTrainingOutput).PointwiseMultiply((1 - predictions).PointwiseLog());
-        return (positiveComponent - negativeComponent).Sum() / TrainingInput.RowCount;
+        return (positiveComponent - negativeComponent).Sum() / input.RowCount;
     }
 
     private static Vector<double> Sigmoid(Vector<double> baseValue)
