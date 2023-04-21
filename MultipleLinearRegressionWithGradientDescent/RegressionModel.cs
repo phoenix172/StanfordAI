@@ -37,7 +37,7 @@ public class RegressionModel
             string[] variables = new[] { "x" }.Concat(Enumerable.Range(2, degree - 1).Select(x => "x^" + x)).ToArray();
 
             funcStr = string.Join("+",
-                variables.Zip(Weight.Select(x=>double.Round(x, decimalPlaces))).Select(x => x.First + "*" + x.Second)) + "+" + Bias;
+                variables.Zip(Weight.Select(x=>Math.Round(x, decimalPlaces))).Select(x => x.First + "*" + x.Second)) + "+" + Bias;
 
             return funcStr;
         }
@@ -47,7 +47,7 @@ public class RegressionModel
 
     public string GetNormalizationEquation(int featureIndex, int decimalPlaces = 5)
     {
-        return $"(x_{featureIndex} - {double.Round(NormalizedInput.Mean[featureIndex], decimalPlaces)})/{double.Round(NormalizedInput.Deviation[featureIndex],decimalPlaces)}";
+        return $"(x_{featureIndex} - {Math.Round(NormalizedInput.Mean[featureIndex], decimalPlaces)})/{Math.Round(NormalizedInput.Deviation[featureIndex],decimalPlaces)}";
     }
 
     //x*14.375091062986135+x^2*22.112854084327648+x^3*36.05371065910582+x^4*50.29443085140673+x^5*49.75632603888832+x^6*12.084475937412718+186.79686666537364

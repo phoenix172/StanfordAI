@@ -1,4 +1,6 @@
 ﻿using System;
+using System.CodeDom;
+using System.Collections;
 using System.Diagnostics;
 using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
@@ -15,6 +17,22 @@ namespace MultipleLinearRegressionWithGradientDescent;
 
 public static class Extensions
 {
+    public static string FormatAsString(this IEnumerable input, string delimiter = ",")
+    {
+        var enumerator = input.GetEnumerator();
+        enumerator.MoveNext();
+        var first = enumerator.Current;
+
+        var values = first switch
+        {
+            IEnumerable => input.Cast<IEnumerable>().Select(x=>x.FormatAsString(delimiter)),
+            _ => input.Cast<object>().Select(x => x.ToString()),
+        };
+
+        return "[" + string.Join(first is IEnumerable ? "\n" : delimiter, values) + "]";
+    }
+
+
     public static ScatterPlotList<double> SamplePlot(this RegressionModel model, WpfPlot plot, int samples =1000)
     {
         var scatterList = plot.Plot.AddScatterList(Color.Red, markerSize: 2f, lineStyle: LineStyle.Solid,
@@ -32,8 +50,8 @@ public static class Extensions
         if (model.OriginalTrainingInput.ColumnCount > 1)
             throw new ArgumentException("Only allowed for models with 1 feature");
 
-        int min = (int)Double.Round(model.OriginalTrainingInput.Column(0).Min());
-        int max = (int)Double.Round(model.OriginalTrainingInput.Column(0).Max())+100;
+        int min = (int)Math.Round(model.OriginalTrainingInput.Column(0).Min());
+        int max = (int)Math.Round(model.OriginalTrainingInput.Column(0).Max())+100;
 
         var xs = Extensions.RangeStep(-max, max, samples);
         var ys = xs.Select(x =>
@@ -146,4 +164,5 @@ public static class Extensions
         double stepSize = Math.Abs(start - end) / steps;
         return Enumerable.Range(0, steps).Select(x => start + x * stepSize).ToArray();
     }
+
 }

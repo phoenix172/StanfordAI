@@ -45,8 +45,9 @@ namespace NeuralNetworks
 
         public static Vector<double> CrossEntropyLoss(Matrix<double> prediction, Vector<double> target)
         {
-            var oneHot = -OneHotReduce(prediction, target);
-            return oneHot;
+            var oneHot = OneHotMatrix(target, prediction);
+            var loss = -prediction.PointwiseLog().PointwiseMultiply(oneHot).RowSums();
+            return loss;
         }
 
         public static Vector<double> OneHotReduce(Matrix<double> input, Vector<double> target)
@@ -83,9 +84,18 @@ namespace NeuralNetworks
 
         private const double LearningRate = 1e-4;
 
+
         public static Matrix<double> Softmax(Matrix<double> input)
         {
-            var exp = input.PointwiseExp();
+            var basedInput = input - Vector<double>.Build.DenseOfEnumerable(
+                input.EnumerateRows().Select(x => x.Max())).ColumnExpand(input.ColumnCount);
+
+            var exp = basedInput.PointwiseExp();
+            //exp = Matrix<double>.Build.DenseOfArray(new double[,]
+            //{
+            //    {1,2,3},
+            //    {4,5,6}
+            //});
             var divisors = Matrix<double>.Build.DenseOfColumns(Enumerable.Repeat(exp.RowSums(), exp.ColumnCount));
             var result = exp.PointwiseDivide(divisors);
             return result;
@@ -103,7 +113,7 @@ namespace NeuralNetworks
             }
         }
 
-        private static Matrix<double> OneHotMatrix(Vector<double> target, Matrix<double> predictions)
+        public static Matrix<double> OneHotMatrix(Vector<double> target, Matrix<double> predictions)
         {
             var oneHot = Matrix<double>.Build.SameAs(predictions);
             for (var index = 0; index < target.Count; index++)
