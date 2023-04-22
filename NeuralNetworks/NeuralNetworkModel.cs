@@ -24,7 +24,7 @@ namespace NeuralNetworks
                 throw new ArgumentException("Last layer must have linear activation function to apply softmax");
         }
 
-        public static Matrix<double> ReLU(Matrix<double> input) => input.PointwiseMaximum(0);
+        public static Matrix<double> ReLU(Matrix<double> input) => input.PointwiseMaximum(double.Epsilon);
         public static Matrix<double> Linear(Matrix<double> input) => input;
         //public static Matrix<double> Sigmoid(Matrix<double> input) => input;
 
@@ -40,11 +40,12 @@ namespace NeuralNetworks
 
             Debug.WriteLine("Cost: " + totalCost);
 
-            return totalCost;
+            return totalCost/input.RowCount;
         }
 
         public static Vector<double> CrossEntropyLoss(Matrix<double> prediction, Vector<double> target)
         {
+            prediction = prediction.Map(x => Math.Clamp(x, 1e-9, 1 - 1e-9), Zeros.Include);
             var oneHot = OneHotMatrix(target, prediction);
             var loss = -prediction.PointwiseLog().PointwiseMultiply(oneHot).RowSums();
             return loss;
@@ -56,6 +57,8 @@ namespace NeuralNetworks
             var hotPredictions = Vector<double>.Build.DenseOfEnumerable(enumerable);
             return hotPredictions;
         }
+
+        public Matrix<double> Predict(Matrix<double> input) => Predict(input, Layers);
 
         private Matrix<double> Predict(Matrix<double> input, DenseLayer[] layers)
         {
@@ -72,17 +75,22 @@ namespace NeuralNetworks
         //One forward propagate and one back-propagate
         //ComputeCost per layer
         //BackPropagate per layer
-        public void Epoch(Matrix<double> input, Vector<double> target)
+        public double Epoch(Matrix<double> input, Vector<double> target, int batchSize = 64)
         {
-            var currentCost = ComputeCost(input, target, Layers);
+            for (int i = 0; i < input.RowCount / batchSize; i++)
+            {
+                int startIndex = batchSize * i;
+                int count = Math.Min(batchSize, input.RowCount - startIndex);
+                var inputSubset = input.SubMatrix(startIndex, count, 0, input.ColumnCount);
+                var targetSubset = target.SubVector(startIndex, count);
 
-            BackPropagate(input, target);
-            currentCost = ComputeCost(input, target, Layers);
+                BackPropagate(inputSubset, targetSubset);
+            }
 
-            Console.WriteLine(currentCost);
+            return ComputeCost(input, target, Layers);
         }
 
-        private const double LearningRate = 1e-4;
+        private const double LearningRate = 1e-5;
 
 
         public static Matrix<double> Softmax(Matrix<double> input)

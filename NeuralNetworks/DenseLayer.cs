@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows.Media;
 using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.Statistics;
 
 namespace NeuralNetworks;
 
@@ -15,6 +16,7 @@ public class DenseLayer
     public Matrix<double> Weight { get; set; }
     public Vector<double> Bias { get; set; }
     public Matrix<double> Input { get; private set; }
+    public Matrix<double> Activations { get; private set; }
 
     public DenseLayer(int inputSize, int units, Func<Matrix<double>, Matrix<double>> activationFunction)
     {
@@ -30,17 +32,61 @@ public class DenseLayer
     {
         Input = input;
         var biasMatrix = Matrix<double>.Build.DenseOfRows(Enumerable.Repeat(Bias, input.RowCount));
-        return ActivationFunction(input.Multiply(Weight).Add(biasMatrix));
+        return Activations = ActivationFunction(input.Multiply(Weight).Add(biasMatrix));
     }
+
+    private Matrix<double> ReluDerivative(Matrix<double> input)
+    {
+        return input.Map(x => x >= 0 ? (double)1 : double.Epsilon);
+    }
+
+    private Matrix<double> ActivationDerivative(Matrix<double> input)
+    {
+        if (ActivationFunction == NeuralNetworkModel.ReLU)
+        {
+            return ReluDerivative(input);
+        }
+        else if (ActivationFunction == NeuralNetworkModel.Linear)
+        {
+            return Matrix<double>.Build.Dense(input.RowCount, input.ColumnCount, 1);
+        }
+
+        throw new NotImplementedException();
+    }
+
+    //public Matrix<double> BackPropagate(Matrix<double> outputDerivative, double learningRate)
+    //{
+    //    var activationDerivative = ActivationDerivative(Input*Weight);
+    //    var weightDerivative = Input.Transpose() * outputDerivative.PointwiseMultiply(activationDerivative);
+    //    var biasDerivative = activationDerivative.ColumnSums();
+
+    //    Weight -=  learningRate * weightDerivative;
+    //    Bias -= learningRate * biasDerivative;
+
+    //    return weightDerivative;
+    //}
 
     public Matrix<double> BackPropagate(Matrix<double> outputDerivative, double learningRate)
     {
-        var derivative = Input.Transpose().Multiply(outputDerivative);
-        var weightDerivative = derivative.Divide(derivative.RowCount);
-        var biasDerivative = outputDerivative.Multiply(Bias);
+        // Calculate the activation derivative
+        var activationDerivative = outputDerivative.PointwiseMultiply(ActivationDerivative(Activations));
 
-        Weight -=  learningRate * weightDerivative;
-        //Bias -= learningRate * outputDerivative.ColumnSums();
-        return derivative;
+        // Calculate the weight derivative
+        var weightDerivative = Input.Transpose() * activationDerivative;
+
+        // Calculate the bias derivative
+        var biasDerivative = activationDerivative.ColumnSums();
+
+        // Update the weights and biases
+        Weight -= learningRate * weightDerivative;
+        Bias -= learningRate * biasDerivative;
+
+        // Calculate the input derivative for the previous layer
+        var inputDerivative = activationDerivative * Weight.Transpose();
+
+        return inputDerivative;
     }
+
+    //derivative of activation function
+    //
 }
