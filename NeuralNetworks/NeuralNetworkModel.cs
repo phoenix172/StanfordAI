@@ -5,8 +5,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using MathNet.Numerics;
 using MathNet.Numerics.Financial;
+using MultipleLinearRegressionWithGradientDescent;
 
 namespace NeuralNetworks
 {
@@ -17,6 +19,7 @@ namespace NeuralNetworks
     {
         public DenseLayer[] Layers { get; }
 
+        public NormalMatrix NormalizedInput { get; private set; }
         public Matrix<double> TrainingInput { get; private set; }
         public Vector<double> Target { get; private set; }
         public double LearningRate { get; set; } = 1e-5;
@@ -65,7 +68,7 @@ namespace NeuralNetworks
             return hotPredictions;
         }
 
-        public Matrix<double> Predict(Matrix<double> input) => Predict(input, Layers);
+        public Matrix<double> Predict(Matrix<double> input) => Predict(Matrix<double>.Build.DenseOfRows(FeatureMapMatrix(input).Select(NormalizedInput.NormalizeRow)), Layers);
 
 
         private Matrix<double> Predict(Matrix<double> input, DenseLayer[] layers)
@@ -86,11 +89,8 @@ namespace NeuralNetworks
 
         //BackPropagate per layer
 
-        public double Epoch(Matrix<double> input, Vector<double> target, int batchSize = 64)
+        private double Epoch(Matrix<double> input, Vector<double> target, int batchSize = 64)
         {
-            TrainingInput = input;
-            Target = target;
-
             for (int i = 0; i < input.RowCount / batchSize; i++)
             {
                 int startIndex = batchSize * i;
@@ -121,7 +121,7 @@ namespace NeuralNetworks
             return result;
         }
 
-        public void BackPropagate(Matrix<double> input, Vector<double> target)
+        private void BackPropagate(Matrix<double> input, Vector<double> target)
         {
             var predictions = Predict(input, Layers);
             var softmax = Softmax(predictions);
@@ -152,9 +152,26 @@ namespace NeuralNetworks
             }
         }
 
+        public Func<Vector<double>, Vector<double>> FeatureMap { get; set; } = x => x;
+
         public IEnumerable<double> Fit(Matrix<double> trainingInput, Vector<double> trainingOutput, int epochs = 1000, int batchSize = 64)
         {
+            NormalizedInput = MapAndNormalizeInput(trainingInput);
+            TrainingInput = NormalizedInput.Normal;
+            Target = trainingOutput;
+
             return Enumerable.Range(1, epochs).Select(x => this.Epoch(trainingInput, trainingOutput, batchSize));
+        }
+
+        private NormalMatrix MapAndNormalizeInput(Matrix<double> trainingInput)
+        {
+            return new NormalMatrix(
+                Matrix<double>.Build.DenseOfRowVectors(FeatureMapMatrix(trainingInput)));
+        }
+
+        private IEnumerable<Vector<double>> FeatureMapMatrix(Matrix<double> input)
+        {
+            return input.EnumerateRows().Select(FeatureMap);
         }
     }
 }

@@ -14,10 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NeuralNetworks\NeuralNetworks.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="car_prices.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

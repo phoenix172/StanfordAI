@@ -1,6 +1,4 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
-using ScottPlot;
-using ScottPlot.Plottable;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -8,6 +6,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using OxyPlot;
 using System.Collections.Generic;
+using OxyPlot.Annotations;
+using OxyPlot.Axes;
+using OxyPlot.Series;
 
 namespace NeuralNetworks;
 
@@ -16,14 +17,12 @@ public static class Extensions
 
     public static Matrix<double> ColumnExpand(this Vector<double> input, int count)
         => Matrix<double>.Build.DenseOfColumns(Enumerable.Repeat(input, count));
+
     public static Matrix<double> RowExpand(this Vector<double> input, int count)
         => Matrix<double>.Build.DenseOfRows(Enumerable.Repeat(input, count));
-
-
-    public static void PlotBoundary(this NeuralNetworkModel model, ScatterPlotList<double> plotList)
+    
+    public static void PlotBoundary(this NeuralNetworkModel model, HeatMapSeries plotList)
     {
-        plotList.Clear();
-
         var rowMajorOriginal = model.TrainingInput.ToRowMajorArray();
         var min = rowMajorOriginal.Min();
         var max = rowMajorOriginal.Max();
@@ -42,7 +41,15 @@ public static class Extensions
         var predictions = NeuralNetworkModel.Softmax(model.Predict(testInput)).EnumerateRows()
             .Select(x => (double)x.MaximumIndex());
 
-        Conrec.Contour(Make2DArray(predictions.ToArray(), range.Length, range.Length), range.ToArray(), range.ToArray(), new[] { 0.5 }, PlotLine(plotList));
+        var levels = Make2DArray(predictions.ToArray(), range.Length, range.Length);
+        plotList.Data = levels;
+        plotList.Interpolate = true;
+        plotList.X0 = min;
+        plotList.X1 = max;
+        plotList.Y0 = min;
+        plotList.Y1 = max;
+
+        //Conrec.Contour(, range.ToArray(), range.ToArray(), RangeStep(0, 1, 10), PlotLine(plotList));
     }
 
 
@@ -83,24 +90,32 @@ public static class Extensions
 
 
 
-    public static Conrec.RendererDelegate PlotLine(ScatterPlotList<double> plot) =>
-        (x1, y1, x2, y2, z) =>
-        {
-            plot.Add(x1, y1);
-            plot.Add(x2, y2);
-        };
+    //public static Conrec.RendererDelegate PlotLine(ScatterPlotList<double> plot) =>
+    //    (x1, y1, x2, y2, z) =>
+    //    {
+    //        plot.Add(x1, y1);
+    //        plot.Add(x2, y2);
+    //    };
 
-    public static async Task<double[]> FitAndPlot(this NeuralNetworkModel model, WpfPlot costPlot,
-        Matrix<double> trainingInput, Vector<double> trainingOutput, int chunkSize = 1000, WpfPlot? dataPlot = null, int epochs = 1000)
+    public static async Task<double[]> FitAndPlot(this NeuralNetworkModel model, OxyPlot.PlotModel costPlot, OxyPlot.PlotModel contourPlot,
+        Matrix<double> trainingInput, Vector<double> trainingOutput, int chunkSize = 1000, int epochs = 1000, int batchSize = 16)
     {
-        var costList = costPlot.Plot.AddScatterList(markerSize: 1.5f, lineStyle: LineStyle.Solid,
-            lineWidth: 0.5f, markerShape: MarkerShape.none);
-        ScatterPlotList<double>? functionPlot = null;
-
-        if (dataPlot != null)
+        var costList = new LineSeries()
         {
-            functionPlot = dataPlot.Plot.AddScatterList<double>(Color.SaddleBrown,lineStyle:LineStyle.None);
-            model.PlotBoundary(functionPlot);
+            MarkerSize = 1.5f,
+            MarkerType = MarkerType.Circle,
+            LineStyle = LineStyle.Solid,
+            Decimator = Decimator.Decimate
+        };
+        costPlot.Series.Add(costList);
+
+        HeatMapSeries? functionPlot = null;
+        if (contourPlot != null)
+        {
+            functionPlot = new HeatMapSeries();
+            functionPlot.RenderMethod = HeatMapRenderMethod.Bitmap;
+            contourPlot.Axes.Add(new LinearColorAxis { Position = AxisPosition.Right, Palette = OxyPalettes.Hot(500)});
+            contourPlot.Series.Insert(0,functionPlot);
         }
 
         double[] PlotChunk(double[] x, int i)
@@ -109,19 +124,24 @@ public static class Extensions
             Debug.WriteLine($"iteration {i}: cost {x.Last()}");
 
             var xs = Enumerable.Range(chunkSize * i, costs.Count).Select(y => (double)y).ToArray();
-            var ys = costs.Select(x=>Math.Exp(Math.Exp(Math.Exp(x)))).ToArray();
+            var ys = costs.Select(x => Math.Exp(Math.Exp(Math.Exp(x)))).ToArray();
 
             var finite = xs.Zip(ys).Where(x => double.IsFinite(x.Second) && !double.IsNaN(x.Second));
-            costList.AddRange(finite.Select(x => x.First).ToArray(), finite.Select(x => x.Second).ToArray());
+            var points = finite.Select(x => new DataPoint(x.First, x.Second));
+            costList.Points.AddRange(points);
 
-            if (dataPlot != null)
+            if (functionPlot!= null)
                 model.PlotBoundary(functionPlot);
 
-            App.Current.Dispatcher.Invoke(() =>
-            {
-                costPlot.RenderRequest();
-                dataPlot?.RenderRequest();
-            });
+            //App.Current.Dispatcher.Invoke(() =>
+            //{
+
+            //    //costPlot.RenderRequest();
+            //    //contourPlot?.RenderRequest();
+            //});
+
+            costPlot.InvalidatePlot(true);
+            contourPlot?.InvalidatePlot(true);
 
 
             return x;
@@ -129,7 +149,8 @@ public static class Extensions
 
         var cost = await Task.Run(() =>
         {
-            var costs = model.Fit(trainingInput, trainingOutput, epochs, 128).Chunk(chunkSize)
+            var costs = model.Fit(trainingInput, trainingOutput, epochs, batchSize)
+                .Chunk(chunkSize)
                 .Select(PlotChunk).ToList();
             return costs.Last();
         });

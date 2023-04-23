@@ -4,8 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NeuralNetworks"
+        xmlns:oxy="http://oxyplot.org/wpf"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" Loaded="MainWindow_OnLoaded">
+        Title="MainWindow" Height="450" Width="800" Loaded="MainWindow_OnLoaded" WindowState="Maximized">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -13,7 +14,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
         <Button Click="ButtonBase_OnClick">Fit</Button>
-        <WpfPlot Name="DataPlot" Grid.Row="1"/>
-        <WpfPlot Name="CostPlot" Grid.Row="2"/>
+        <oxy:PlotView Name="DataPlot" Grid.Row="1"/>
+        <oxy:PlotView Name="CostPlot" Grid.Row="2"/>
     </Grid>
 </Window>

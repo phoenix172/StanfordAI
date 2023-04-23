@@ -43,7 +43,7 @@ namespace AI.Tests
 
             for (int i = 0; i < 100; i++)
             {
-                model.Epoch(input, target);
+                //model.Epoch(input, target);
             }
 
         }
