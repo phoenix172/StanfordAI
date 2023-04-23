@@ -47,7 +47,7 @@ namespace AI.Tests
             }
 
         }
-
+        
         [Test]
         public void CrossEntropyTest2()
         {

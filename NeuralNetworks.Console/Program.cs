@@ -27,7 +27,6 @@ namespace NeuralNetworks.Console
                 if (i % 100 == 0)
                     System.Console.WriteLine(cost);
             }
-            
 
             Verify(model);
         }

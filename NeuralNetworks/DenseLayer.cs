@@ -25,7 +25,9 @@ public class DenseLayer
         ActivationFunction = activationFunction;
 
         Weight = Matrix<double>.Build.Random(inputSize, units).Divide(10);
-        Bias = Vector<double>.Build.Dense(units);
+        Bias = Vector<double>.Build.Random(units).Divide(10);
+        Activations = Matrix<double>.Build.Random(inputSize, units).Divide(10);
+        Input = Matrix<double>.Build.Random(inputSize, units).Divide(10);
     }
 
     public Matrix<double> ForwardPropagate(Matrix<double> input)

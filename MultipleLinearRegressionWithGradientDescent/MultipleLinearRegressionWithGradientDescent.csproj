@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
@@ -11,6 +11,10 @@
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
     <PackageReference Include="ScottPlot.WPF" Version="4.1.61" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NeuralNetworks\NeuralNetworks.csproj" />
   </ItemGroup>
 
   <ItemGroup>

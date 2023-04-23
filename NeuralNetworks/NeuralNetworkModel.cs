@@ -17,6 +17,11 @@ namespace NeuralNetworks
     {
         public DenseLayer[] Layers { get; }
 
+        public Matrix<double> TrainingInput { get; private set; }
+        public Vector<double> Target { get; private set; }
+        public double LearningRate { get; set; } = 1e-5;
+
+
         public NeuralNetworkModel(params DenseLayer[] layers)
         {
             Layers = layers;
@@ -26,6 +31,8 @@ namespace NeuralNetworks
 
         public static Matrix<double> ReLU(Matrix<double> input) => input.PointwiseMaximum(double.Epsilon);
         public static Matrix<double> Linear(Matrix<double> input) => input;
+
+
         //public static Matrix<double> Sigmoid(Matrix<double> input) => input;
 
 
@@ -38,7 +45,7 @@ namespace NeuralNetworks
             var costs = CrossEntropyLoss(softmax, target);
             var totalCost = costs.Sum();
 
-            Debug.WriteLine("Cost: " + totalCost);
+            //Debug.WriteLine("Cost: " + totalCost);
 
             return totalCost/input.RowCount;
         }
@@ -60,6 +67,7 @@ namespace NeuralNetworks
 
         public Matrix<double> Predict(Matrix<double> input) => Predict(input, Layers);
 
+
         private Matrix<double> Predict(Matrix<double> input, DenseLayer[] layers)
         {
             var current = input;
@@ -73,10 +81,16 @@ namespace NeuralNetworks
         }
 
         //One forward propagate and one back-propagate
+
         //ComputeCost per layer
+
         //BackPropagate per layer
+
         public double Epoch(Matrix<double> input, Vector<double> target, int batchSize = 64)
         {
+            TrainingInput = input;
+            Target = target;
+
             for (int i = 0; i < input.RowCount / batchSize; i++)
             {
                 int startIndex = batchSize * i;
@@ -89,8 +103,6 @@ namespace NeuralNetworks
 
             return ComputeCost(input, target, Layers);
         }
-
-        private const double LearningRate = 1e-5;
 
 
         public static Matrix<double> Softmax(Matrix<double> input)
@@ -123,40 +135,26 @@ namespace NeuralNetworks
 
         public static Matrix<double> OneHotMatrix(Vector<double> target, Matrix<double> predictions)
         {
-            var oneHot = Matrix<double>.Build.SameAs(predictions);
-            for (var index = 0; index < target.Count; index++)
+            try
             {
-                oneHot[index, (int)target[index] - 1] = 1;
+                var oneHot = Matrix<double>.Build.SameAs(predictions);
+                for (var index = 0; index < target.Count; index++)
+                {
+                    oneHot[index, (int)target[index] - 1] = 1;
+                }
+
+                return oneHot;
             }
-            return oneHot;
+            catch(Exception ex)
+            {
+                throw new ArgumentException(
+                    "Failed to calculate OneHotMatrix for predictions. Labels are probably incorrectly specified. Should have equal count as the features and start from 1", ex);
+            }
         }
 
-        //public void BackPropagate(Matrix<double> input, Vector<double> target)
-        //{
-        //    double epsilon = 1e-1;
-        //    var currentOutput = ComputeCost(input, target, Layers);
-        //    Matrix<double>[] layerDiff = new Matrix<double>[Layers.Length];
-        //    for (int layerIndex = Layers.Length - 1; layerIndex >= 0; layerIndex--)
-        //    {
-        //        var layer = Layers[layerIndex];
-        //        var nudgeMatrix = Matrix<double>.Build.SameAs(layer.Weight);
-        //        layer.Weight.CopyTo(nudgeMatrix);
-        //        layerDiff[layerIndex] = Matrix<double>.Build.SameAs(layer.Weight);
-
-        //        for (int i = 0; i < nudgeMatrix.RowCount; i++)
-        //            for (int j = 0; j < nudgeMatrix.ColumnCount; j++)
-        //            {
-        //                nudgeMatrix[i,j] += epsilon;
-        //                var layersCopy = Layers[..layerIndex].Append(layer.WithWeight(nudgeMatrix)).Concat(Layers[(layerIndex+1)..]).ToArray();
-        //                var nudgeOutput = ComputeCost(input, target, layersCopy);
-        //                double diff = (nudgeOutput - currentOutput) / epsilon;
-        //                layerDiff[layerIndex][i, j] = diff;
-        //                Console.WriteLine(diff);
-        //                nudgeMatrix[i, j] -= epsilon;
-        //                layer.Weight[i,j] -= LearningRate * diff;
-        //            }
-        //    }
-        //}
-
+        public IEnumerable<double> Fit(Matrix<double> trainingInput, Vector<double> trainingOutput, int epochs = 1000, int batchSize = 64)
+        {
+            return Enumerable.Range(1, epochs).Select(x => this.Epoch(trainingInput, trainingOutput, batchSize));
+        }
     }
 }

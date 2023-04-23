@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Runtime.CompilerServices;
+using NeuralNetworks;
 using OxyPlot;
 using ScottPlot.Plottable;
 
@@ -111,6 +112,7 @@ public static class Extensions
         return cost;
     }
 
+
     public static T1[,] Grid<T, T1>(this IEnumerable<T> input, Func<T,T,T1> valueFunc)
     {
         var data = input.ToList();
@@ -148,21 +150,24 @@ public static class Extensions
                 return z;
             });
 
-        void PlotNormalLine(double x1, double y1, double x2, double y2, double z)
-        {
-            var a = model.NormalizedInput.NormalizeRow(model.FeatureMap(Vector<double>.Build.Dense(new[] { x1, y1 })));
-            var b = model.NormalizedInput.NormalizeRow(model.FeatureMap(Vector<double>.Build.Dense(new[] { x2, y2 })));
-            plot.Plot.AddLine(a[0], a[1], b[0], b[1], Color.Blue);
-        }
-
-        Conrec.Contour(valuesGrid, range.ToArray(), range.ToArray(), new[] { 0.5 }, PlotNormalLine);
+        Conrec.Contour(valuesGrid, range.ToArray(), range.ToArray(), new[] { 0.5 }, model.PlotNormalLine(plot));
         plot.Refresh();
     }
+
+
 
     public static double[] RangeStep(double start, double end, int steps)
     {
         double stepSize = Math.Abs(start - end) / steps;
         return Enumerable.Range(0, steps).Select(x => start + x * stepSize).ToArray();
     }
+
+    public static Conrec.RendererDelegate PlotNormalLine(this RegressionModel model, WpfPlot plot) =>
+        (x1, y1, x2, y2, z) =>
+        {
+            var a = model.NormalizedInput.NormalizeRow(model.FeatureMap(Vector<double>.Build.Dense(new[] { x1, y1 })));
+            var b = model.NormalizedInput.NormalizeRow(model.FeatureMap(Vector<double>.Build.Dense(new[] { x2, y2 })));
+            plot.Plot.AddLine(a[0], a[1], b[0], b[1], Color.Blue);
+        };
 
 }

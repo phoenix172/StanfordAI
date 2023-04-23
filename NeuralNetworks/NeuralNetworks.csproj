@@ -14,6 +14,22 @@
 
   <ItemGroup>
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+    <PackageReference Include="ScottPlot" Version="4.1.61" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ScottPlot.WPF">
+      <HintPath>C:\Users\i.iochev\.nuget\packages\scottplot.wpf\4.1.61\lib\net6.0-windows7.0\ScottPlot.WPF.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ex2data1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="spiral.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
