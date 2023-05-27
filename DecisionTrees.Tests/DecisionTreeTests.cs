@@ -77,4 +77,24 @@ public class DecisionTreeTests
         TrainingInput.IndicesOf(tree.Children[1].Children[1].Items)
             .Should().BeEquivalentTo(new[] { 2,6,8,9 });
     }
+
+    [Test]
+    public void Generate_GeneratesExpectedChildren()
+    {
+        var tree = BuildTree();
+
+        tree.Generate(x=>x.Depth>2);
+
+        TrainingInput.IndicesOf(tree.Children[0].Children[0].Items)
+            .Should().BeEquivalentTo(new[] { 0, 4, 5, 7 });
+
+        TrainingInput.IndicesOf(tree.Children[0].Children[1].Items)
+            .Should().BeEquivalentTo(new[] { 3 });
+
+        TrainingInput.IndicesOf(tree.Children[1].Children[0].Items)
+            .Should().BeEquivalentTo(new[] { 1 });
+
+        TrainingInput.IndicesOf(tree.Children[1].Children[1].Items)
+            .Should().BeEquivalentTo(new[] { 2, 6, 8, 9 });
+    }
 }
