@@ -22,7 +22,7 @@ namespace NeuralNetworks.Console
             
             for (int i = 0; i < 500; i++)
             {
-                var cost = model.Epoch(input, target);
+                var cost = 0;//model.Epoch(input, target);
 
                 if (i % 100 == 0)
                     System.Console.WriteLine(cost);

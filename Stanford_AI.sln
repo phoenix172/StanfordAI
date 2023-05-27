@@ -9,7 +9,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetworks", "NeuralNet
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AI.Tests", "AI.Tests\AI.Tests.csproj", "{E7AB28B2-DB5F-4D20-88C9-98BA8A142CC3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuralNetworks.Console", "NeuralNetworks.Console\NeuralNetworks.Console.csproj", "{3F94995F-7144-4DF3-B06A-0512B5BE7560}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetworks.Console", "NeuralNetworks.Console\NeuralNetworks.Console.csproj", "{3F94995F-7144-4DF3-B06A-0512B5BE7560}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TensorflowTest", "TensorflowTest\TensorflowTest.csproj", "{FE173966-001D-4CB8-9340-E2C0D6D4BA6C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DecisionTrees", "DecisionTrees\DecisionTrees.csproj", "{B1C39440-8B3C-412C-ACB0-B716FE24D58D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DecisionTrees.Tests", "DecisionTrees.Tests\DecisionTrees.Tests.csproj", "{F8325A3D-6282-4AFA-B15B-78BAE42172AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +39,18 @@ Global
 		{3F94995F-7144-4DF3-B06A-0512B5BE7560}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F94995F-7144-4DF3-B06A-0512B5BE7560}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F94995F-7144-4DF3-B06A-0512B5BE7560}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE173966-001D-4CB8-9340-E2C0D6D4BA6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE173966-001D-4CB8-9340-E2C0D6D4BA6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE173966-001D-4CB8-9340-E2C0D6D4BA6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE173966-001D-4CB8-9340-E2C0D6D4BA6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1C39440-8B3C-412C-ACB0-B716FE24D58D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1C39440-8B3C-412C-ACB0-B716FE24D58D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1C39440-8B3C-412C-ACB0-B716FE24D58D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1C39440-8B3C-412C-ACB0-B716FE24D58D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8325A3D-6282-4AFA-B15B-78BAE42172AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8325A3D-6282-4AFA-B15B-78BAE42172AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8325A3D-6282-4AFA-B15B-78BAE42172AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8325A3D-6282-4AFA-B15B-78BAE42172AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
