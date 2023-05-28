@@ -1,6 +1,6 @@
-﻿namespace DecisionTrees.Tests;
+﻿namespace DecisionTrees.Tests.TestData;
 
-public class AnimalsTestDecisionTree
+public class AnimalsTestDecisionTree : TestDecisionTree
 {
     public enum Features
     {
@@ -9,8 +9,8 @@ public class AnimalsTestDecisionTree
         Whiskers
     }
 
-    public static readonly int[][] TrainingInput =
-        new [,]
+    public override int[][] TrainingInput { get; } =
+    new[,]
         {
             { 1, 1, 1 },
             { 0, 0, 1 },
@@ -24,9 +24,9 @@ public class AnimalsTestDecisionTree
             { 0, 1, 0 }
         }.ToJagged();
 
-    public static readonly int[] TrainingOutput = { 1, 1, 0, 0, 1, 1, 0, 1, 0, 0 };
+    public override int[] TrainingOutput { get; } = { 1, 1, 0, 0, 1, 1, 0, 1, 0, 0 };
 
-    public static DecisionTreeNode<int[]> BuildTree()
+    public override DecisionTreeNode<int[]> BuildTree()
     {
         DecisionTreeNode<int[]> tree = DecisionTreeBuilder.Create(TrainingInput)
             .FeatureIndex(0, Features.EarShape.ToString())
@@ -36,4 +36,11 @@ public class AnimalsTestDecisionTree
             .Build();
         return tree;
     }
+}
+
+public abstract class TestDecisionTree
+{
+    public abstract int[][] TrainingInput { get; }
+    public abstract int[] TrainingOutput { get; }
+    public abstract DecisionTreeNode<int[]> BuildTree();
 }
