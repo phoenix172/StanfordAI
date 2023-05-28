@@ -14,13 +14,12 @@ namespace NeuralNetworks;
 
 public static class Extensions
 {
-
     public static Matrix<double> ColumnExpand(this Vector<double> input, int count)
         => Matrix<double>.Build.DenseOfColumns(Enumerable.Repeat(input, count));
 
     public static Matrix<double> RowExpand(this Vector<double> input, int count)
         => Matrix<double>.Build.DenseOfRows(Enumerable.Repeat(input, count));
-    
+
     public static void PlotBoundary(this NeuralNetworkModel model, HeatMapSeries plotList)
     {
         var rowMajorOriginal = model.TrainingInput.ToRowMajorArray();
@@ -85,9 +84,9 @@ public static class Extensions
                 output[i, j] = input[i * width + j];
             }
         }
+
         return output;
     }
-
 
 
     //public static Conrec.RendererDelegate PlotLine(ScatterPlotList<double> plot) =>
@@ -97,8 +96,10 @@ public static class Extensions
     //        plot.Add(x2, y2);
     //    };
 
-    public static async Task<double[]> FitAndPlot(this NeuralNetworkModel model, OxyPlot.PlotModel costPlot, OxyPlot.PlotModel contourPlot,
-        Matrix<double> trainingInput, Vector<double> trainingOutput, int chunkSize = 1000, int epochs = 1000, int batchSize = 16)
+    public static async Task<double[]> FitAndPlot(this NeuralNetworkModel model, OxyPlot.PlotModel costPlot,
+        OxyPlot.PlotModel contourPlot,
+        Matrix<double> trainingInput, Vector<double> trainingOutput, int chunkSize = 1000, int epochs = 1000,
+        int batchSize = 16)
     {
         var costList = new LineSeries()
         {
@@ -114,8 +115,8 @@ public static class Extensions
         {
             functionPlot = new HeatMapSeries();
             functionPlot.RenderMethod = HeatMapRenderMethod.Bitmap;
-            contourPlot.Axes.Add(new LinearColorAxis { Position = AxisPosition.Right, Palette = OxyPalettes.Hot(500)});
-            contourPlot.Series.Insert(0,functionPlot);
+            contourPlot.Axes.Add(new LinearColorAxis { Position = AxisPosition.Right, Palette = OxyPalettes.Hot(500) });
+            contourPlot.Series.Insert(0, functionPlot);
         }
 
         double[] PlotChunk(double[] x, int i)
@@ -130,7 +131,7 @@ public static class Extensions
             var points = finite.Select(x => new DataPoint(x.First, x.Second));
             costList.Points.AddRange(points);
 
-            if (functionPlot!= null)
+            if (functionPlot != null)
                 model.PlotBoundary(functionPlot);
 
             //App.Current.Dispatcher.Invoke(() =>
@@ -156,5 +157,4 @@ public static class Extensions
         });
         return cost;
     }
-
 }

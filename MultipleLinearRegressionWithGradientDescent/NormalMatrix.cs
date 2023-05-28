@@ -16,7 +16,7 @@ public class NormalMatrix
     public MathNet.Numerics.LinearAlgebra.Vector<double> Deviation { get; private set; }
     public Matrix<double> Original { get; }
     public Matrix<double> Normal { get; private set; }
-    
+
     private void Normalize()
     {
         Deviation = MathNet.Numerics.LinearAlgebra.Vector<double>.Build.Dense(Original.ColumnCount);
@@ -37,7 +37,8 @@ public class NormalMatrix
         return (input - Mean).PointwiseDivide(Deviation);
     }
 
-    private MathNet.Numerics.LinearAlgebra.Vector<double> Normalize(MathNet.Numerics.LinearAlgebra.Vector<double> input, out double deviation, out double mean)
+    private MathNet.Numerics.LinearAlgebra.Vector<double> Normalize(MathNet.Numerics.LinearAlgebra.Vector<double> input,
+        out double deviation, out double mean)
     {
         double deviationValue = deviation = StandardDeviation(input);
         double meanValue = mean = input.Average();

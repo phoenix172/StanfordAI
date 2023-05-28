@@ -4,7 +4,8 @@ public class MushroomsTestDecisionTree : TestDecisionTree
 {
     public override int[][] TrainingInput { get; } = new[,]
     {
-        { 1, 1, 1 }, { 1, 0, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 1, 1 }, { 0, 1, 1 }, { 0, 0, 0 }, { 1, 0, 1 }, { 0, 1, 0 }, { 1, 0, 0 }
+        { 1, 1, 1 }, { 1, 0, 1 }, { 1, 0, 0 }, { 1, 0, 0 }, { 1, 1, 1 }, { 0, 1, 1 }, { 0, 0, 0 }, { 1, 0, 1 },
+        { 0, 1, 0 }, { 1, 0, 0 }
     }.ToJagged();
 
     public override int[] TrainingOutput { get; } = { 1, 1, 0, 0, 1, 0, 0, 1, 1, 0 };

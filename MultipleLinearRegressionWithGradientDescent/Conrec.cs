@@ -106,10 +106,11 @@ namespace OxyPlot
             // Note that castab is arranged differently from the FORTRAN code because
             // Fortran and C/C++ arrays are transposed of each other, in this case
             // it is more tricky as castab is in 3 dimension
-            int[,,] castab = {
-                                 { { 0, 0, 8 }, { 0, 2, 5 }, { 7, 6, 9 } }, { { 0, 3, 4 }, { 1, 3, 1 }, { 4, 3, 0 } },
-                                 { { 9, 6, 7 }, { 5, 2, 0 }, { 8, 0, 0 } }
-                             };
+            int[,,] castab =
+            {
+                { { 0, 0, 8 }, { 0, 2, 5 }, { 7, 6, 9 } }, { { 0, 3, 4 }, { 1, 3, 1 }, { 4, 3, 0 } },
+                { { 9, 6, 7 }, { 5, 2, 0 }, { 8, 0, 0 } }
+            };
 
             Func<int, int, double> xsect = (p1, p2) => (h[p2] * xh[p1] - h[p1] * xh[p2]) / (h[p2] - h[p1]);
             Func<int, int, double> ysect = (p1, p2) => (h[p2] * yh[p1] - h[p1] * yh[p2]) / (h[p2] - h[p1]);

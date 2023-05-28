@@ -10,7 +10,7 @@ public class AnimalsTestDecisionTree : TestDecisionTree
     }
 
     public override int[][] TrainingInput { get; } =
-    new[,]
+        new[,]
         {
             { 1, 1, 1 },
             { 0, 0, 1 },
@@ -40,7 +40,6 @@ public class AnimalsTestDecisionTree : TestDecisionTree
 
 public abstract class TestDecisionTree : TestDecisionTree<int[], int>
 {
-
 }
 
 public abstract class TestDecisionTree<TNode, TTarget>

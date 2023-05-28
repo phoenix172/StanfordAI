@@ -9,12 +9,12 @@
         Title="MainWindow" Height="450" Width="800" Loaded="MainWindow_OnLoaded" WindowState="Maximized">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <Button Click="ButtonBase_OnClick">Fit</Button>
-        <oxy:PlotView Name="DataPlot" Grid.Row="1"/>
-        <oxy:PlotView Name="CostPlot" Grid.Row="2"/>
+        <oxy:PlotView Name="DataPlot" Grid.Row="1" />
+        <oxy:PlotView Name="CostPlot" Grid.Row="2" />
     </Grid>
 </Window>

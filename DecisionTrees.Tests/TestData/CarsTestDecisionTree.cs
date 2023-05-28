@@ -33,7 +33,11 @@ public class CarsTestDecisionTree : TestDecisionTree<int[], CarsTestDecisionTree
             { 1, 1, 0 }
         }.ToJagged();
 
-    public override Drivetrain[] TrainingOutput { get; } = { Drivetrain.Fwd, Drivetrain.Rwd, Drivetrain.Awd, Drivetrain.Fwd, Drivetrain.Rwd, Drivetrain.Awd, Drivetrain.Fwd, Drivetrain.Rwd, Drivetrain.Awd, Drivetrain.Fwd };
+    public override Drivetrain[] TrainingOutput { get; } =
+    {
+        Drivetrain.Fwd, Drivetrain.Rwd, Drivetrain.Awd, Drivetrain.Fwd, Drivetrain.Rwd, Drivetrain.Awd, Drivetrain.Fwd,
+        Drivetrain.Rwd, Drivetrain.Awd, Drivetrain.Fwd
+    };
 
     public override DecisionTreeNode<int[], Drivetrain> BuildTree()
     {

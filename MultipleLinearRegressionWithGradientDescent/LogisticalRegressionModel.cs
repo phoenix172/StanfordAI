@@ -6,13 +6,14 @@ namespace MultipleLinearRegressionWithGradientDescent;
 
 public class LogisticalRegressionModel : RegressionModel
 {
-    protected override Vector<double> ComputePrediction(Matrix<double> input, Vector<double> weight, double bias) 
+    protected override Vector<double> ComputePrediction(Matrix<double> input, Vector<double> weight, double bias)
         => Sigmoid(input.Multiply(weight) + bias);
 
-    protected override double ComputePrediction(Vector<double> input, Vector<double> weight, double bias) 
+    protected override double ComputePrediction(Vector<double> input, Vector<double> weight, double bias)
         => Sigmoid(input.DotProduct(weight) + bias);
 
-    protected override double ComputeCost(Vector<double> weight, double bias, Matrix<double>? input=null, Vector<double>? output = null)
+    protected override double ComputeCost(Vector<double> weight, double bias, Matrix<double>? input = null,
+        Vector<double>? output = null)
     {
         input ??= TrainingInput;
         output ??= TrainingOutput;

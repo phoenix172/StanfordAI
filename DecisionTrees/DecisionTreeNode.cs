@@ -15,7 +15,8 @@ public static class DecisionTreeBuilder
 
 public static class DecisionTreeBuilderExtensions
 {
-    public static DecisionTreeBuilder<TValue[], TTarget> ColumnFeatures<TValue, TTarget>(this DecisionTreeBuilder<TValue[], TTarget> builder, params string[] names)
+    public static DecisionTreeBuilder<TValue[], TTarget> ColumnFeatures<TValue, TTarget>(
+        this DecisionTreeBuilder<TValue[], TTarget> builder, params string[] names)
         where TValue : INumber<TValue>
     {
         var columnsCount = builder.Items.First().Length;
@@ -28,10 +29,11 @@ public static class DecisionTreeBuilderExtensions
         return builder;
     }
 
-    public static DecisionTreeBuilder<TValue[], TTarget> FeatureIndex<TValue, TTarget>(this DecisionTreeBuilder<TValue[], TTarget> builder, int featureIndex, string? name = null)
+    public static DecisionTreeBuilder<TValue[], TTarget> FeatureIndex<TValue, TTarget>(
+        this DecisionTreeBuilder<TValue[], TTarget> builder, int featureIndex, string? name = null)
         where TValue : INumber<TValue>
     {
-        return builder.Feature((_,x) => x[featureIndex] > default(TValue), name);
+        return builder.Feature((_, x) => x[featureIndex] > default(TValue), name);
     }
 }
 
@@ -92,10 +94,10 @@ public class DecisionTreeFeature<TNode> : DecisionTreeFeature<TNode, bool>
             else
                 right.Add(item);
         }
+
         return (left, right);
     }
 }
-
 
 public class DecisionTreeFeature<TNode, TValue>
 {
@@ -123,7 +125,8 @@ public class DecisionTreeSplit<TNode, TTarget>
     public IEnumerable<TNode> Left { get; }
     public IEnumerable<TNode> Right { get; }
 
-    public DecisionTreeSplit(IEnumerable<TNode> items, DecisionTreeFeature<TNode> splitFeature, DecisionTreeFeature<TNode, TTarget> targetFeature)
+    public DecisionTreeSplit(IEnumerable<TNode> items, DecisionTreeFeature<TNode> splitFeature,
+        DecisionTreeFeature<TNode, TTarget> targetFeature)
     {
         Items = items;
         SplitFeature = splitFeature;
@@ -150,7 +153,8 @@ public class DecisionTreeSplit<TNode, TTarget>
 
 public class DecisionTreeNode<TNode> : DecisionTreeNode<TNode, bool>
 {
-    public DecisionTreeNode(IEnumerable<TNode> items, DecisionTreeFeature<TNode, bool> targetFeature, int depth = 0, params DecisionTreeFeature<TNode>[] features)
+    public DecisionTreeNode(IEnumerable<TNode> items, DecisionTreeFeature<TNode, bool> targetFeature, int depth = 0,
+        params DecisionTreeFeature<TNode>[] features)
         : base(items, targetFeature, depth, features)
     {
     }
@@ -168,7 +172,8 @@ public class DecisionTreeNode<TNode, TTarget>
     public bool IsLeaf => Children.Count == 0;
     public DecisionTreeFeature<TNode>[] Features { get; }
 
-    public DecisionTreeNode(IEnumerable<TNode> items, DecisionTreeFeature<TNode,TTarget> targetFeature, int depth = 0, params DecisionTreeFeature<TNode>[] features)
+    public DecisionTreeNode(IEnumerable<TNode> items, DecisionTreeFeature<TNode, TTarget> targetFeature, int depth = 0,
+        params DecisionTreeFeature<TNode>[] features)
     {
         Items = items.ToList();
 
@@ -178,7 +183,7 @@ public class DecisionTreeNode<TNode, TTarget>
         TargetFeature = targetFeature;
         Depth = depth;
         Features = features;
-        Children = new List<DecisionTreeNode<TNode,TTarget>>();
+        Children = new List<DecisionTreeNode<TNode, TTarget>>();
     }
 
     public DecisionTreeSplit<TNode, TTarget> Split(string featureName) => Split(GetFeature(featureName));
@@ -219,8 +224,7 @@ public class DecisionTreeNode<TNode, TTarget>
 
     public void GenerateChildren(DecisionTreeFeature<TNode>? splitFeature = null)
     {
-        var split = splitFeature == null ? 
-            BestSplit() : Split(splitFeature);
+        var split = splitFeature == null ? BestSplit() : Split(splitFeature);
 
         GenerateChildren(split);
     }
@@ -244,6 +248,7 @@ public class DecisionTreeNode<TNode, TTarget>
             Children.Add(new DecisionTreeNode<TNode, TTarget>(split.Left, TargetFeature, Depth + 1, Features));
             Children.Add(new DecisionTreeNode<TNode, TTarget>(split.Right, TargetFeature, Depth + 1, Features));
         }
+
         if (Children.Any())
             SplitOn = split;
     }

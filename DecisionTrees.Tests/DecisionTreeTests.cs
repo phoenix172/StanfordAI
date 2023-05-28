@@ -1,7 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using DecisionTrees.Tests.TestData;
 using FluentAssertions;
-
 using static DecisionTrees.Tests.TestData.AnimalsTestDecisionTree;
 
 namespace DecisionTrees.Tests;

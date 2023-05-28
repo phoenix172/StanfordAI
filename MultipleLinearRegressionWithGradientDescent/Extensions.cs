@@ -25,7 +25,7 @@ public static class Extensions
 
         var values = first switch
         {
-            IEnumerable => input.Cast<IEnumerable>().Select(x=>x.FormatAsString(delimiter)),
+            IEnumerable => input.Cast<IEnumerable>().Select(x => x.FormatAsString(delimiter)),
             _ => input.Cast<object>().Select(x => x.ToString()),
         };
 
@@ -33,7 +33,7 @@ public static class Extensions
     }
 
 
-    public static ScatterPlotList<double> SamplePlot(this RegressionModel model, WpfPlot plot, int samples =1000)
+    public static ScatterPlotList<double> SamplePlot(this RegressionModel model, WpfPlot plot, int samples = 1000)
     {
         var scatterList = plot.Plot.AddScatterList(Color.Red, markerSize: 2f, lineStyle: LineStyle.Solid,
             lineWidth: 2f, markerShape: MarkerShape.none);
@@ -42,7 +42,8 @@ public static class Extensions
         return scatterList;
     }
 
-    public static void SamplePlot(this RegressionModel model, ScatterPlotList<double> plotList, int samples = 1000, bool clear = true)
+    public static void SamplePlot(this RegressionModel model, ScatterPlotList<double> plotList, int samples = 1000,
+        bool clear = true)
     {
         if (model.Weight == null)
             return;
@@ -51,7 +52,7 @@ public static class Extensions
             throw new ArgumentException("Only allowed for models with 1 feature");
 
         int min = (int)Math.Round(model.OriginalTrainingInput.Column(0).Min());
-        int max = (int)Math.Round(model.OriginalTrainingInput.Column(0).Max())+100;
+        int max = (int)Math.Round(model.OriginalTrainingInput.Column(0).Max()) + 100;
 
         var xs = Extensions.RangeStep(-max, max, samples);
         var ys = xs.Select(x =>
@@ -63,7 +64,7 @@ public static class Extensions
             return y;
         }).ToArray();
 
-        if(clear)plotList.Clear();
+        if (clear) plotList.Clear();
 
         plotList.AddRange(xs, ys);
     }
@@ -89,7 +90,7 @@ public static class Extensions
             var finite = xs.Zip(ys).Where(x => double.IsFinite(x.Second) && !double.IsNaN(x.Second));
             costList.AddRange(finite.Select(x => x.First).ToArray(), finite.Select(x => x.Second).ToArray());
 
-            if (dataPlot != null) 
+            if (dataPlot != null)
                 model.SamplePlot(functionPlot);
 
             App.Current.Dispatcher.Invoke(() =>
@@ -112,15 +113,15 @@ public static class Extensions
     }
 
 
-    public static T1[,] Grid<T, T1>(this IEnumerable<T> input, Func<T,T,T1> valueFunc)
+    public static T1[,] Grid<T, T1>(this IEnumerable<T> input, Func<T, T, T1> valueFunc)
     {
         var data = input.ToList();
-        var result = new T1[data.Count,data.Count];
+        var result = new T1[data.Count, data.Count];
         for (int i = 0; i < data.Count; i++)
         {
             for (int j = 0; j < data.Count; j++)
             {
-                result[i,j] = valueFunc(data[i], data[j]);
+                result[i, j] = valueFunc(data[i], data[j]);
             }
         }
 
@@ -136,7 +137,7 @@ public static class Extensions
         min -= Math.Abs(min) * 0.25;
         max += Math.Abs(max) * 0.25;
 
-        var range = RangeStep(min, max ,100);
+        var range = RangeStep(min, max, 100);
 
         double minZ = double.MaxValue;
         double maxZ = double.MinValue;
@@ -154,7 +155,6 @@ public static class Extensions
     }
 
 
-
     public static double[] RangeStep(double start, double end, int steps)
     {
         double stepSize = Math.Abs(start - end) / steps;
@@ -168,5 +168,4 @@ public static class Extensions
             var b = model.NormalizedInput.NormalizeRow(model.FeatureMap(Vector<double>.Build.Dense(new[] { x2, y2 })));
             plot.Plot.AddLine(a[0], a[1], b[0], b[1], Color.Blue);
         };
-
 }

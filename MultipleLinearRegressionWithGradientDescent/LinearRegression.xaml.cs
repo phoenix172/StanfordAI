@@ -46,9 +46,12 @@ namespace MultipleLinearRegressionWithGradientDescent
             using var streamReader = new StreamReader("car_prices.csv");
             using var csvReader = new CsvHelper.CsvReader(streamReader, CultureInfo.InvariantCulture, false);
             Records = csvReader.GetRecords<CarPriceRecord>().ToList();
-            
-            _inputX = Matrix<double>.Build.DenseOfRowVectors(Records.Select(x => MathNet.Numerics.LinearAlgebra.Vector<double>.Build.DenseOfArray(new[] { x.CylindersCount, x.CityMpg, x.HorsePower, x.WheelBase })).ToArray());
-            _inputY = MathNet.Numerics.LinearAlgebra.Vector<double>.Build.DenseOfEnumerable(Records.Select(x => x.Price));
+
+            _inputX = Matrix<double>.Build.DenseOfRowVectors(Records.Select(x =>
+                MathNet.Numerics.LinearAlgebra.Vector<double>.Build.DenseOfArray(new[]
+                    { x.CylindersCount, x.CityMpg, x.HorsePower, x.WheelBase })).ToArray());
+            _inputY =
+                MathNet.Numerics.LinearAlgebra.Vector<double>.Build.DenseOfEnumerable(Records.Select(x => x.Price));
 
             InitializeComponent();
         }
@@ -84,13 +87,15 @@ namespace MultipleLinearRegressionWithGradientDescent
             ShowScatter(_inputY.ToArray(), 1, xLabel: "CityMpg", yLabel: "Price");
             ShowScatter(_inputY.ToArray(), 2, xLabel: "HorsePower", yLabel: "Price");
             ShowScatter(_inputY.ToArray(), 3, xLabel: "WheelBase", yLabel: "Price");
-
         }
 
         private void PredictClick(object sender, RoutedEventArgs e)
         {
             var input = new[]
-                { double.Parse(tbCylinders.Text), double.Parse(tbCityMpg.Text), double.Parse(tbHorsePower.Text), double.Parse(tbWheelBase.Text) };
+            {
+                double.Parse(tbCylinders.Text), double.Parse(tbCityMpg.Text), double.Parse(tbHorsePower.Text),
+                double.Parse(tbWheelBase.Text)
+            };
             double result =
                 _model.Predict(MathNet.Numerics.LinearAlgebra.Vector<double>.Build.DenseOfArray(input));
             lbPrice.Content = result;

@@ -8,17 +8,18 @@
         Title="LogisticalLinearRegression" Height="450" Width="800" Name="root">
     <Grid DataContext="{Binding ElementName=root}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Button Click="Descent_Click">Descent</Button>
-        <WpfPlot Name="DataPlot" Grid.Row="1"/>
-        <WpfPlot Name="CostPlot" Grid.Row="2"/>
-        
-        <DataGrid ItemsSource="{Binding Records}" Grid.Row="3" MouseDoubleClick="Control_OnMouseDoubleClick" Name="data">
+        <WpfPlot Name="DataPlot" Grid.Row="1" />
+        <WpfPlot Name="CostPlot" Grid.Row="2" />
+
+        <DataGrid ItemsSource="{Binding Records}" Grid.Row="3" MouseDoubleClick="Control_OnMouseDoubleClick"
+                  Name="data">
 
         </DataGrid>
     </Grid>

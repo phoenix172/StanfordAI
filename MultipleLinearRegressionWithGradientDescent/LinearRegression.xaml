@@ -33,13 +33,14 @@
             <Label>Price</Label><Label Name="lbPrice"></Label>
             <Button Click="PredictClick">Predict</Button>
         </StackPanel>
-        <DataGrid Grid.Row="4" ItemsSource="{Binding ElementName=root, Path=Records}" AutoGenerateColumns="False" Name="inputGrid">
+        <DataGrid Grid.Row="4" ItemsSource="{Binding ElementName=root, Path=Records}" AutoGenerateColumns="False"
+                  Name="inputGrid">
             <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding CylindersCount}" Header="Cylinders"/>
-                <DataGridTextColumn Binding="{Binding CityMpg}" Header="CityMpg"/>
-                <DataGridTextColumn Binding="{Binding HorsePower}" Header="HorsePower"/>
-                <DataGridTextColumn Binding="{Binding WheelBase}" Header="WheelBase"/>
-                <DataGridTextColumn Binding="{Binding Price}" Header="Price"/>
+                <DataGridTextColumn Binding="{Binding CylindersCount}" Header="Cylinders" />
+                <DataGridTextColumn Binding="{Binding CityMpg}" Header="CityMpg" />
+                <DataGridTextColumn Binding="{Binding HorsePower}" Header="HorsePower" />
+                <DataGridTextColumn Binding="{Binding WheelBase}" Header="WheelBase" />
+                <DataGridTextColumn Binding="{Binding Price}" Header="Price" />
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

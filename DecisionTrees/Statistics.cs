@@ -13,7 +13,8 @@ public static class Statistics
         return 0;
     }
 
-    public static double Entropy<TNode, TValue>(this IEnumerable<TNode> items, DecisionTreeFeature<TNode, TValue> targetFeature)
+    public static double Entropy<TNode, TValue>(this IEnumerable<TNode> items,
+        DecisionTreeFeature<TNode, TValue> targetFeature)
     {
         var itemsList = items.ToList();
 
@@ -40,6 +41,6 @@ public static class Statistics
 
     public static bool IsApproximately(this double fraction, double value)
     {
-        return Math.Abs(fraction - value)<double.Epsilon;
+        return Math.Abs(fraction - value) < double.Epsilon;
     }
 }

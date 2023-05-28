@@ -12,7 +12,6 @@ using MultipleLinearRegressionWithGradientDescent;
 
 namespace NeuralNetworks
 {
-
     //Softmax Cross Entropy Cost Function
     //Linear layer must be last
     public class NeuralNetworkModel
@@ -50,7 +49,7 @@ namespace NeuralNetworks
 
             //Debug.WriteLine("Cost: " + totalCost);
 
-            return totalCost/input.RowCount;
+            return totalCost / input.RowCount;
         }
 
         public static Vector<double> CrossEntropyLoss(Matrix<double> prediction, Vector<double> target)
@@ -68,7 +67,8 @@ namespace NeuralNetworks
             return hotPredictions;
         }
 
-        public Matrix<double> Predict(Matrix<double> input) => Predict(Matrix<double>.Build.DenseOfRows(FeatureMapMatrix(input).Select(NormalizedInput.NormalizeRow)), Layers);
+        public Matrix<double> Predict(Matrix<double> input) => Predict(
+            Matrix<double>.Build.DenseOfRows(FeatureMapMatrix(input).Select(NormalizedInput.NormalizeRow)), Layers);
 
 
         private Matrix<double> Predict(Matrix<double> input, DenseLayer[] layers)
@@ -145,16 +145,18 @@ namespace NeuralNetworks
 
                 return oneHot;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new ArgumentException(
-                    "Failed to calculate OneHotMatrix for predictions. Labels are probably incorrectly specified. Should have equal count as the features and start from 1", ex);
+                    "Failed to calculate OneHotMatrix for predictions. Labels are probably incorrectly specified. Should have equal count as the features and start from 1",
+                    ex);
             }
         }
 
         public Func<Vector<double>, Vector<double>> FeatureMap { get; set; } = x => x;
 
-        public IEnumerable<double> Fit(Matrix<double> trainingInput, Vector<double> trainingOutput, int epochs = 1000, int batchSize = 64)
+        public IEnumerable<double> Fit(Matrix<double> trainingInput, Vector<double> trainingOutput, int epochs = 1000,
+            int batchSize = 64)
         {
             NormalizedInput = MapAndNormalizeInput(trainingInput);
             TrainingInput = NormalizedInput.Normal;

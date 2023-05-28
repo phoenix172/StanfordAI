@@ -65,11 +65,9 @@ namespace MultipleLinearRegressionWithGradientDescent
             using var csvReader = new CsvHelper.CsvReader(streamReader, CultureInfo.InvariantCulture, false);
             Records = new ObservableCollection<DataPoint>(csvReader.GetRecords<DataPoint>().OrderBy(x => x.X));
 
-            _inputX = Matrix<double>.Build.DenseOfRowVectors(Records.Select(x => Vector<double>.Build.DenseOfArray(new[] { x.X })).ToArray());
+            _inputX = Matrix<double>.Build.DenseOfRowVectors(Records
+                .Select(x => Vector<double>.Build.DenseOfArray(new[] { x.X })).ToArray());
             _inputY = Vector<double>.Build.DenseOfEnumerable(Records.Select(x => x.Y));
-
-
-
         }
 
         private void GenericLinearRegression_OnLoaded(object sender, RoutedEventArgs e)
@@ -87,6 +85,5 @@ namespace MultipleLinearRegressionWithGradientDescent
             Debug.WriteLine(_model.GetNormalizationEquation(0));
             Debug.WriteLine(_model.GetModelExpression());
         }
-
     }
 }

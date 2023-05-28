@@ -37,14 +37,14 @@ namespace NeuralNetworks
 
             var inputData = File.ReadAllLines("spiral.csv").Skip(1)
                 .Select(x => x.Split(',').Select(double.Parse).ToArray()).ToArray();
-            
+
             var denseOfRowArrays = Matrix<double>.Build.DenseOfRowArrays(
                 inputData.Select(x => x[..2]));
 
             var normalMatrix = new NormalMatrix(denseOfRowArrays);
             _input = normalMatrix.Normal;
 
-            _target = Vector<double>.Build.DenseOfEnumerable(inputData.Select(x => x[2]+1));
+            _target = Vector<double>.Build.DenseOfEnumerable(inputData.Select(x => x[2] + 1));
         }
 
 
@@ -71,8 +71,8 @@ namespace NeuralNetworks
                 {
                     DataPlot.Model.Annotations.Add(new PointAnnotation()
                     {
-                        X = _input[i,0],
-                        Y = _input[i,1],
+                        X = _input[i, 0],
+                        Y = _input[i, 1],
                         Fill = OxyColors.Red,
                         Layer = AnnotationLayer.AboveSeries
                     });

@@ -9,7 +9,7 @@ namespace DecisionTrees.Tests
         {
         }
 
-        [TestCase(0.5,1)]
+        [TestCase(0.5, 1)]
         [TestCase(0, 0)]
         [TestCase(1, 0)]
         public void Test_Entropy(double fraction, double expectedEntropy)

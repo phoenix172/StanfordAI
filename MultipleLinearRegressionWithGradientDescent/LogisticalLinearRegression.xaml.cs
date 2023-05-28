@@ -52,10 +52,12 @@ namespace MultipleLinearRegressionWithGradientDescent
                 _model.TrainingThreshold = 1e-7;
                 _model.LearningRate = 1e-5;
             }
+
             _model.RegularizationTerm = 1000;
             _model.FeatureMap = RegressionModel.MapFeatureDegree(12);
 
-            var valuesArray = File.ReadAllLines(dataFile).Select(x => x.Split(',').Select(double.Parse).ToArray()).ToArray();
+            var valuesArray = File.ReadAllLines(dataFile).Select(x => x.Split(',').Select(double.Parse).ToArray())
+                .ToArray();
             _inputX = Matrix<double>.Build.DenseOfRows(valuesArray.GetLength(0), valuesArray.First().Length - 1,
                 valuesArray.Select(a => a[..^1]));
             _inputY = Vector<double>.Build.Dense(valuesArray.Select(x => x.Last()).ToArray());

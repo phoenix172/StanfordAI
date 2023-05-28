@@ -25,19 +25,21 @@ public class RegressionModel
 
     public Func<Vector<double>, Vector<double>> FeatureMap { get; set; } = x => x;
 
-    public double Predict(Vector<double> input) 
+    public double Predict(Vector<double> input)
         => ComputePrediction(NormalizedInput.NormalizeRow(FeatureMap(input)), Weight, Bias);
 
     public string GetModelEquation(int decimalPlaces = 5)
     {
         string funcStr;
-        if (OriginalTrainingInput.ColumnCount==1)
+        if (OriginalTrainingInput.ColumnCount == 1)
         {
             int degree = TrainingInput.ColumnCount;
             string[] variables = new[] { "x" }.Concat(Enumerable.Range(2, degree - 1).Select(x => "x^" + x)).ToArray();
 
             funcStr = string.Join("+",
-                variables.Zip(Weight.Select(x=>Math.Round(x, decimalPlaces))).Select(x => x.First + "*" + x.Second)) + "+" + Bias;
+                          variables.Zip(Weight.Select(x => Math.Round(x, decimalPlaces)))
+                              .Select(x => x.First + "*" + x.Second)) +
+                      "+" + Bias;
 
             return funcStr;
         }
@@ -47,7 +49,8 @@ public class RegressionModel
 
     public string GetNormalizationEquation(int featureIndex, int decimalPlaces = 5)
     {
-        return $"(x_{featureIndex} - {Math.Round(NormalizedInput.Mean[featureIndex], decimalPlaces)})/{Math.Round(NormalizedInput.Deviation[featureIndex],decimalPlaces)}";
+        return
+            $"(x_{featureIndex} - {Math.Round(NormalizedInput.Mean[featureIndex], decimalPlaces)})/{Math.Round(NormalizedInput.Deviation[featureIndex], decimalPlaces)}";
     }
 
     //x*14.375091062986135+x^2*22.112854084327648+x^3*36.05371065910582+x^4*50.29443085140673+x^5*49.75632603888832+x^6*12.084475937412718+186.79686666537364
@@ -61,14 +64,17 @@ public class RegressionModel
 
         Expression NormalParamDegree(double degree)
         {
-            BinaryExpression normalParam = Expression.Divide(Expression.Subtract(param, Expression.Constant(NormalizedInput.Mean[0])), Expression.Constant(NormalizedInput.Deviation[0]));
+            BinaryExpression normalParam =
+                Expression.Divide(Expression.Subtract(param, Expression.Constant(NormalizedInput.Mean[0])),
+                    Expression.Constant(NormalizedInput.Deviation[0]));
             var pesho = typeof(Math).GetMethod(nameof(Math.Pow), BindingFlags.Static | BindingFlags.Public);
-            var expression = Expression.Call(null, pesho, new Expression[] {normalParam, Expression.Constant(degree)});
+            var expression =
+                Expression.Call(null, pesho, new Expression[] { normalParam, Expression.Constant(degree) });
             return expression;
             //return Expression.Power(normalParam, Expression.Constant(degree));
         }
 
-        var terms = Weight.Select((d,i) => Expression.Multiply(NormalParamDegree(i+1), Expression.Constant(d)))
+        var terms = Weight.Select((d, i) => Expression.Multiply(NormalParamDegree(i + 1), Expression.Constant(d)))
             .Aggregate(Expression.Add);
         var modelEquation = Expression.Add(terms, Expression.Constant(Bias));
         return Expression.Lambda<Func<double, double>>(modelEquation, param);
@@ -113,7 +119,7 @@ public class RegressionModel
         double cost = GradientStep();
 
         yield return cost;
-        while (Math.Abs(cost-lastCost)/lastCost > TrainingThreshold)
+        while (Math.Abs(cost - lastCost) / lastCost > TrainingThreshold)
         {
             lastCost = cost;
             cost = GradientStep();
@@ -121,7 +127,7 @@ public class RegressionModel
         }
     }
 
-    private Matrix<double> FeatureMapMatrix(Matrix<double> input) 
+    private Matrix<double> FeatureMapMatrix(Matrix<double> input)
         => Matrix<double>.Build.DenseOfRows(input.EnumerateRows().Select(FeatureMap));
 
     private double GradientStep()
@@ -130,9 +136,10 @@ public class RegressionModel
 
         double cost = 0;
         int batch = 0;
-        for (; batch < TrainingInput.RowCount/BatchSize; batch++)
+        for (; batch < TrainingInput.RowCount / BatchSize; batch++)
         {
-            cost += GradientStep((batch * BatchSize)..Math.Min((batch * BatchSize + BatchSize - 1), TrainingInput.RowCount));
+            cost += GradientStep((batch * BatchSize)..Math.Min((batch * BatchSize + BatchSize - 1),
+                TrainingInput.RowCount));
         }
 
         return cost;
@@ -144,43 +151,46 @@ public class RegressionModel
         Matrix<double> input = TrainingInput.SubMatrix(offset, length, 0, TrainingInput.ColumnCount);
         Vector<double> output = TrainingOutput.SubVector(offset, length);
 
-        var (weightGradient, biasGradient) = ComputeGradient(Weight, Bias,input, output);
+        var (weightGradient, biasGradient) = ComputeGradient(Weight, Bias, input, output);
         Weight -= LearningRate * weightGradient;
         Bias -= LearningRate * biasGradient;
         var cost = ComputeCost(Weight, Bias, input, output) + CostRegularizationTerm(Weight);
         return cost;
     }
 
-    private (Vector<double> WeightGradient, double BiasGradient) ComputeGradient(Vector<double> weight, double bias, Matrix<double>? input = null, Vector<double>? output = null)
+    private (Vector<double> WeightGradient, double BiasGradient) ComputeGradient(Vector<double> weight, double bias,
+        Matrix<double>? input = null, Vector<double>? output = null)
     {
         input ??= TrainingInput;
         output ??= TrainingOutput;
 
         var predictions = ComputePrediction(input, weight, bias);
         var errors = (predictions - output);
-        
+
         var biasGradient = errors.Sum() / predictions.Count;
 
         var weightGradient = input.LeftMultiply(errors).Divide(predictions.Count) + GradientRegularizationTerm(weight);
 
-        var weightGradient1 = input.Transpose().Multiply(errors).Divide(predictions.Count) + GradientRegularizationTerm(weight);
+        var weightGradient1 = input.Transpose().Multiply(errors).Divide(predictions.Count) +
+                              GradientRegularizationTerm(weight);
 
         Debug.Assert(weightGradient.SequenceEqual(weightGradient1));
 
         return (weightGradient, biasGradient);
     }
 
-    protected virtual double ComputeCost(Vector<double> weight, double bias, Matrix<double>? input = null, Vector<double>? output = null)
+    protected virtual double ComputeCost(Vector<double> weight, double bias, Matrix<double>? input = null,
+        Vector<double>? output = null)
     {
         input ??= TrainingInput;
         output ??= TrainingOutput;
-        
+
         var predictions = ComputePrediction(input, weight, bias);
         var squaredError = (predictions - output).PointwisePower(2).Sum();
-        return squaredError / (2*input.RowCount);
+        return squaredError / (2 * input.RowCount);
     }
 
-    private Vector<double> GradientRegularizationTerm(Vector<double> weight, Matrix<double>? data= null)
+    private Vector<double> GradientRegularizationTerm(Vector<double> weight, Matrix<double>? data = null)
     {
         data ??= TrainingInput;
         return (RegularizationTerm / data.RowCount) * weight;
@@ -199,6 +209,6 @@ public class RegressionModel
 
     protected virtual double ComputePrediction(Vector<double> input, Vector<double> weight, double bias)
     {
-        return input.DotProduct(weight)+bias;
+        return input.DotProduct(weight) + bias;
     }
 }

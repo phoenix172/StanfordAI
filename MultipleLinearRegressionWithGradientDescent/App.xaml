@@ -4,6 +4,6 @@
              xmlns:local="clr-namespace:MultipleLinearRegressionWithGradientDescent"
              StartupUri="LinearRegression.xaml">
     <Application.Resources>
-         
+
     </Application.Resources>
 </Application>

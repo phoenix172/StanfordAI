@@ -19,10 +19,10 @@ namespace NeuralNetworks.Console
             var (input, target) = GenerateEquallySplitDataSet(2000);
 
             System.Console.WriteLine("target");
-            
+
             for (int i = 0; i < 500; i++)
             {
-                var cost = 0;//model.Epoch(input, target);
+                var cost = 0; //model.Epoch(input, target);
 
                 if (i % 100 == 0)
                     System.Console.WriteLine(cost);
@@ -62,10 +62,11 @@ namespace NeuralNetworks.Console
             System.Console.WriteLine($"Errors: {errors}/{testInput.RowCount}");
         }
 
-        private static (Matrix<double> input, Vector<double> target) GenerateEquallySplitDataSet(int count, int maxValue = 1000)
+        private static (Matrix<double> input, Vector<double> target) GenerateEquallySplitDataSet(int count,
+            int maxValue = 1000)
         {
-            var (input1, target1) = GenerateTestData(count/2, SumGreaterThan200, 0,100);
-            var (input2, target2) = GenerateTestData(count/2, SumGreaterThan200, 200, maxValue);
+            var (input1, target1) = GenerateTestData(count / 2, SumGreaterThan200, 0, 100);
+            var (input2, target2) = GenerateTestData(count / 2, SumGreaterThan200, 200, maxValue);
 
             var input = Matrix<double>.Build.DenseOfRows(input1.EnumerateRows().Concat(input2.EnumerateRows()));
             var target = Vector<double>.Build.DenseOfEnumerable(target1.Concat(target2));
@@ -77,12 +78,14 @@ namespace NeuralNetworks.Console
             return (double)(x.Sum() > 200 ? 2 : 1);
         }
 
-        private static (Matrix<double> input, Vector<double> target) GenerateTestData(int count, Func<Vector<double>, double> targetSelector, int minValue = 0, int maxValue = 1000)
+        private static (Matrix<double> input, Vector<double> target) GenerateTestData(int count,
+            Func<Vector<double>, double> targetSelector, int minValue = 0, int maxValue = 1000)
         {
             var inputArray = Enumerable.Range(1, count).Select(x =>
             {
                 var numbers =
-                    Vector<double>.Build.DenseOfEnumerable(Enumerable.Range(0, 2).Select(_ => (double)Rand.Next(minValue, maxValue)));
+                    Vector<double>.Build.DenseOfEnumerable(Enumerable.Range(0, 2)
+                        .Select(_ => (double)Rand.Next(minValue, maxValue)));
                 return numbers;
             }).ToList();
 
