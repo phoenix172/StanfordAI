@@ -26,9 +26,9 @@ public class AnimalsTestDecisionTree : TestDecisionTree
 
     public override int[] TrainingOutput { get; } = { 1, 1, 0, 0, 1, 1, 0, 1, 0, 0 };
 
-    public override DecisionTreeNode<int[]> BuildTree()
+    public override DecisionTreeNode<int[], int> BuildTree()
     {
-        DecisionTreeNode<int[]> tree = DecisionTreeBuilder.Create(TrainingInput)
+        var tree = DecisionTreeBuilder.Create<int[], int>(TrainingInput)
             .FeatureIndex(0, Features.EarShape.ToString())
             .FeatureIndex(1, Features.FaceShape.ToString())
             .FeatureIndex(2, Features.Whiskers.ToString())
@@ -38,9 +38,14 @@ public class AnimalsTestDecisionTree : TestDecisionTree
     }
 }
 
-public abstract class TestDecisionTree
+public abstract class TestDecisionTree : TestDecisionTree<int[], int>
 {
-    public abstract int[][] TrainingInput { get; }
-    public abstract int[] TrainingOutput { get; }
-    public abstract DecisionTreeNode<int[]> BuildTree();
+
+}
+
+public abstract class TestDecisionTree<TNode, TTarget>
+{
+    public abstract TNode[] TrainingInput { get; }
+    public abstract TTarget[] TrainingOutput { get; }
+    public abstract DecisionTreeNode<TNode, TTarget> BuildTree();
 }

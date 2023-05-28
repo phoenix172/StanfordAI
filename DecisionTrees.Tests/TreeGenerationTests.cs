@@ -10,7 +10,7 @@ public class TreeGenerationTests
     [Test]
     public void Generate_UsesBestSplit_CorrectNodes()
     {
-        DecisionTreeNode<int[]> tree = _testTree.BuildTree();
+        var tree = _testTree.BuildTree();
         tree.Generate(x=>x.Depth >= 3);
 
         _testTree.TrainingInput.IndicesOf(tree.Children[0].Children[0].Items)
@@ -29,8 +29,10 @@ public class TreeGenerationTests
     [Test]
     public void Predict_ReturnsCorrectResult()
     {
-        DecisionTreeNode<int[]> tree = _testTree.BuildTree();
+        var tree = _testTree.BuildTree();
         tree.Generate(x => x.Depth >= 3);
+        tree.Print(_testTree);
+
 
         tree.Predict(_testTree.TrainingInput[0]);
     }
