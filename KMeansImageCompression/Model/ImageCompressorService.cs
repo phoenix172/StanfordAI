@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -15,18 +16,27 @@ public class ImageCompressorService
         var pixels = originalImage.GetPixels();
     }
 
-    public void FindClosestCentroids(PixelColor[,] pixels, PixelColor[] centroids)
+    public Vector<int> FindClosestCentroids(PixelColor[,] pixels, PixelColor[] centroids)
     {
-        var flatPixels = pixels.Cast<PixelColor>().ToArray();
-        var pixelCentroids = from pixel in flatPixels
-            from centroid in centroids
-            select (pixel, centroid);
-        //pixelCentroids.Select(x => DistanceToCentroid(x.pixel, x.centroid));
-    }
+        Matrix<double> pixelMatrix = pixels.Cast<PixelColor>().ToArray().ToMatrix();
+        Matrix<double> centroidMatrix = centroids.ToMatrix();
 
-    private Vector<double> DistanceToCentroid(Matrix<double> pixels, Matrix<double> centroid)
-    {
-        return (pixels - centroid).PointwiseAbs().RowSums();
+        //Matrix<Centroid(K) by Pixel(n=s*s)>
+        Matrix<double> centroidDistanceMatrix = Matrix<double>.Build.DenseOfRowVectors
+        (
+        centroidMatrix
+                .EnumerateRows()
+                .Select(centroid => Extensions.DistanceToCentroid(pixelMatrix, centroid))
+        );
 
+        //Result Vector<int> : index of closest centroid
+        var closestCentroids = Vector<int>.Build.DenseOfEnumerable
+        (
+            centroidDistanceMatrix
+                .EnumerateColumns()
+                .Select(pixelDistancesColumn => pixelDistancesColumn.MinimumIndex())
+        );
+
+        return closestCentroids;
     }
 }

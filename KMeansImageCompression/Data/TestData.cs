@@ -7,5 +7,5 @@ namespace KMeansImageCompression.Data;
 public static class TestData
 {
     public static BitmapImage OriginalImage =
-            new(new Uri(Environment.CurrentDirectory + "/OriginalImage.jpeg"));
+            new(new Uri(Environment.CurrentDirectory + "/Data/OriginalImage.jpeg"));
 }
