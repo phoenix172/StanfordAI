@@ -1,0 +1,28 @@
+﻿<Window x:Class="KMeansImageCompression.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:KMeansImageCompression"
+        mc:Ignorable="d"
+        Title="MainWindow"
+        WindowState="Maximized"
+        d:DataContext="{d:DesignInstance local:MainViewModel}"
+        d:DesignWidth="800" d:DesignHeight="600">
+    <StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Button Command="{Binding CompressImageCommand}">Compress</Button>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <StackPanel Margin="10">
+                <Label>Original</Label>
+                    <Image Name="ImageOriginal" Source="{Binding OriginalImage}"/>
+            </StackPanel>
+
+            <StackPanel Margin="10">
+                <Label>Compressed</Label>
+                <Image Name="ImageCompressed" Source="{Binding CompressedImage}" />
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
+</Window>
