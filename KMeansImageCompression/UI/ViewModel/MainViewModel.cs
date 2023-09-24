@@ -2,6 +2,7 @@
 using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.Input;
 using KMeansImageCompression.Data;
+using KMeansImageCompression.Model;
 
 namespace KMeansImageCompression;
 
@@ -24,7 +25,9 @@ public partial class MainViewModel
     [RelayCommand]
     public void CompressImage()
     {
-        
+            new ImageCompressorService().Load();
 
     }
+
+    
 }
