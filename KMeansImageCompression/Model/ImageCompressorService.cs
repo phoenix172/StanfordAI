@@ -25,12 +25,19 @@ public class ImageCompressorService
         Matrix<double> pixelMatrix = pixels.ToMatrix();
 
         var centroids = CreateCentroidMatrix(pixelMatrix, 16);
+        Vector<double>? closestCentroidIndices = null;
+        Matrix<double>? kMeans = null;
+        for (int i = 0; i < 24; i++)
+        { 
+            //Vector<double>
+                closestCentroidIndices = FindClosestCentroids(pixelMatrix, centroids); //new color index for each pixel
 
-        Vector<double> closestCentroidIndices = FindClosestCentroids(pixelMatrix, centroids); //new color index for each pixel
+            //Matrix<double> 
+                kMeans = ComputeCentroids(pixelMatrix, closestCentroidIndices); //new colors\
+                centroids = kMeans;
+        }
 
-        Matrix<double> kMeans = ComputeCentroids(pixelMatrix, closestCentroidIndices); //new colors
-
-        var compressedBitmapMatrix = Matrix<double>.Build.DenseOfRowVectors
+    var compressedBitmapMatrix = Matrix<double>.Build.DenseOfRowVectors
         (
         closestCentroidIndices
                 .EnumerateIndexed()
