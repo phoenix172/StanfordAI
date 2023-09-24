@@ -1,32 +1,35 @@
 ﻿using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KMeansImageCompression.Data;
 using KMeansImageCompression.Model;
 
 namespace KMeansImageCompression;
 
+[ObservableObject]
 public partial class MainViewModel
 {
+    [ObservableProperty]private BitmapSource _compressedImage;
+
     public MainViewModel()
-        : this(TestData.OriginalImage, TestData.OriginalImage)
+        : this(TestData.Get24BitOriginalImage(), TestData.Get24BitOriginalImage())
     {
     }
 
-    public MainViewModel(BitmapImage originalImage, BitmapImage compressedImage)
+    public MainViewModel(BitmapSource originalImage, BitmapSource compressedImage)
     {
         OriginalImage = originalImage;
-        CompressedImage = compressedImage;
+        _compressedImage = compressedImage;
     }
 
-    public BitmapImage OriginalImage { get; }
-    public BitmapImage CompressedImage { get; }
+    public BitmapSource OriginalImage { get; }
 
     [RelayCommand]
     public void CompressImage()
     {
-            new ImageCompressorService().Load();
-
+        var a = new ImageCompressorService();
+        CompressedImage = a.CompressImage(OriginalImage);
     }
 
     
