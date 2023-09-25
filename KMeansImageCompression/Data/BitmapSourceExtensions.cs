@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows;
 using System.IO;
+using KMeansImageCompression.Model;
 
 namespace KMeansImageCompression.Data;
 
@@ -21,22 +22,6 @@ public struct PixelColor
 
 public static class BitmapSourceExtensions
 {
-    //public static PixelColor[,] GetPixels(this BitmapSource source, PixelFormat? targetFormat = null)
-    //{
-    //    targetFormat ??= PixelFormats.Rgb24;
-
-    //    if (source.Format != targetFormat)
-    //        source = new FormatConvertedBitmap(source, targetFormat.Value, null, 0);
-
-    //    int width = source.PixelWidth;
-    //    int height = source.PixelHeight;
-    //    PixelColor[,] result = new PixelColor[width, height];
-
-    //    source.CopyPixels(result, width * 4, 0);
-
-    //    return result;
-    //}
-
     public static PixelColor[] GetPixels(this BitmapSource source)
     {
         byte[] pixels = new byte[
@@ -55,16 +40,11 @@ public static class BitmapSourceExtensions
         return pixelsArray;
     }
 
-    public static BitmapSource ToBitmapImage(this Matrix<double> pixels, BitmapSource originalImage)
+    public static BitmapSource ToBitmapImage(this Matrix<double> pixels, BitmapSource originalImage, BitmapPalette? palette = null)
     {
-        // Define parameters used to create the BitmapSource.
-        var newBitmap = new WriteableBitmap(originalImage.PixelWidth, originalImage.PixelHeight, originalImage.DpiX, originalImage.DpiY, PixelFormats.Rgb24, null);
+        var newBitmap = new WriteableBitmap(originalImage.PixelWidth, originalImage.PixelHeight, originalImage.DpiX, originalImage.DpiY, PixelFormats.Rgb24, palette);
 
-        var bytesCount = originalImage.PixelHeight * originalImage.PixelWidth *
-            originalImage.Format.BitsPerPixel / 8;
-
-        byte[] pixelBytes = pixels.EnumerateRows().SelectMany(x => x.Select(y=>(byte)y).ToArray()).ToArray();
-        //Debug.Assert(bytesCount == pixelBytes.Length);
+        byte[] pixelBytes = pixels.EnumerateRows().SelectMany(x => x.Select(y => (byte)y).ToArray()).ToArray();
 
         newBitmap.WritePixels(
             new Int32Rect(0, 0, newBitmap.PixelWidth, newBitmap.PixelHeight),
@@ -75,10 +55,17 @@ public static class BitmapSourceExtensions
         return newBitmap;
     }
 
-    public static void SaveToFile(this BitmapSource image, string filePath)
+    public static void SaveToFile(this BitmapSource image, string filePath, BitmapEncoder? encoder = null)
     {
-        using var fileStream = new FileStream(filePath, FileMode.Create);
-        BitmapEncoder encoder = new PngBitmapEncoder();
+        string destinationPath = 
+        Path.Combine(
+            Path.GetDirectoryName(filePath),
+            Path.GetFileNameWithoutExtension(filePath))+
+            Constants.OutputImageFileExtension;
+
+        using var fileStream = new FileStream(destinationPath, FileMode.Create);
+        encoder ??= new PngBitmapEncoder();
+
         encoder.Frames.Add(BitmapFrame.Create(image));
         encoder.Save(fileStream);
     }

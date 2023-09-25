@@ -53,7 +53,7 @@ namespace KMeansImageCompression.Tests
 
         private static string GetResultFileName()
         {
-            var resultFileName = Path.Combine(ResultsFolder, Guid.NewGuid() + ".png");
+            var resultFileName = Path.Combine(ResultsFolder, Guid.NewGuid() + Constants.OutputImageFileExtension);
             return resultFileName;
         }
     }

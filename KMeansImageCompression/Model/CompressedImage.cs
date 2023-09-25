@@ -12,6 +12,7 @@ using KMeansImageCompression.Data;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Complex;
 using NumSharp;
+using Color = System.Windows.Media.Color;
 
 namespace KMeansImageCompression.Model;
 
@@ -60,7 +61,7 @@ public class CompressedImage
             }
         );
 
-        var compressedImage = result.ToMatrix().ToBitmapImage(_imageSource);
+        var compressedImage = result.ToImage(_imageSource);
 
         return compressedImage;
     }
@@ -74,6 +75,20 @@ public class CompressedImage
                 ClosestCentroidIndices.Select(x => Centroids.Row((int)x))
             );
             return matrix;
+        }
+
+        public BitmapSource ToImage(BitmapSource originalImage)
+        {
+            var colors = Centroids
+                .EnumerateRows()
+                .Select(x => Color.FromRgb((byte)x[0], (byte)x[1], (byte)x[2]))
+                .ToList();
+
+            BitmapPalette palette = new BitmapPalette(colors);
+
+            var image
+                =  ToMatrix().ToBitmapImage(originalImage, palette);
+            return image;
         }
     }
 
@@ -105,7 +120,6 @@ public class CompressedImage
         var closestCentroids = centroidDistanceMatrix
             .EnumerateRows()
             .Select(pixelDistancesColumn => (uint)pixelDistancesColumn.MinimumIndex())
-            //.Select(x=>(uint)Math.Min(centroidMatrix.RowCount, (uint)x))
             .ToArray();
 
         return closestCentroids;

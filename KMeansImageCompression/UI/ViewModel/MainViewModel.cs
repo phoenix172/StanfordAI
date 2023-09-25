@@ -1,17 +1,22 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using KMeansImageCompression.Data;
 using KMeansImageCompression.Model;
+using Microsoft.Win32;
 
 namespace KMeansImageCompression;
 
 [ObservableObject]
 public partial class MainViewModel
 {
-    [ObservableProperty] private BitmapSource _compressedImage;
+    [NotifyCanExecuteChangedFor(nameof(SaveCompressedCommand))]
+    [ObservableProperty] private BitmapSource? _compressedImage;
+    [ObservableProperty] private BitmapSource _originalImage;
     [ObservableProperty] private int _iterations = 24;
     [ObservableProperty] private int _colors = 16;
 
@@ -24,21 +29,51 @@ public partial class MainViewModel
     public MainViewModel(BitmapSource image)
     {
         OriginalImage = image;
-        _compressedImage = image;
     }
 
-    public BitmapSource OriginalImage { get; }
+    [RelayCommand]
+    public void OpenImage()
+    {
+        OpenFileDialog fileDialog = new OpenFileDialog();
+        if (fileDialog.ShowDialog() == true)
+        {
+            OriginalImage = new BitmapImage(new Uri(fileDialog.FileName));
+        }
+    }
+
+    public bool CanSaveCompressed => CompressedImage != null;
+
+    [RelayCommand(CanExecute = nameof(CanSaveCompressed))]
+    public void SaveCompressed()
+    {
+        if (CompressedImage == null) return;
+
+        SaveFileDialog fileDialog = new SaveFileDialog()
+        {
+            Filter = $"JPEG Image | *{Constants.OutputImageFileExtension}"
+        };
+        if (fileDialog.ShowDialog() == true)
+        {
+            CompressedImage.SaveToFile(fileDialog.FileName);
+        }
+    }
 
     [RelayCommand(AllowConcurrentExecutions = false)]
     public async Task CompressImage()
     {
-        var a = new CompressedImage(OriginalImage,new()
+        var a = new CompressedImage(OriginalImage, new()
         {
             IterationsCount = Iterations,
             TargetColorsCount = Colors
         });
-        CompressedImage = await a.CompressImageAsync();
 
-        CompressedImage.SaveToFile("compressed.png");
+        try
+        {
+            CompressedImage = await a.CompressImageAsync();
+        }
+        catch(Exception ex)
+        {
+            MessageBox.Show("Failed to compress image: "+ex.Message);
+        }
     }
 }

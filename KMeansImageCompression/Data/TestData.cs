@@ -1,21 +1,14 @@
 ﻿using System;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using KMeansImageCompression.Model;
 
 namespace KMeansImageCompression.Data;
 
 public static class TestData
 {
-    public static BitmapImage OriginalImage =
-            new(new Uri(Environment.CurrentDirectory + "/Data/OriginalImage.jpeg"));
-
-    public static BitmapSource Get24BitOriginalImage(this BitmapSource originalImage)
-    {
-        FormatConvertedBitmap converted = new FormatConvertedBitmap();
-        converted.BeginInit();
-        converted.Source = OriginalImage;
-        converted.DestinationFormat = PixelFormats.Rgb24;
-        converted.EndInit();
-        return converted;
-    }
+    public static BitmapImage OriginalImage = LoadBitmapImage("/Data/1.png");
+    
+    private static BitmapImage LoadBitmapImage(string path)
+        => new(new Uri(Environment.CurrentDirectory + path));
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 using KMeansImageCompression.Data;
 using MathNet.Numerics.LinearAlgebra;
 
@@ -53,18 +54,9 @@ public static class Extensions
 
         int n = a.RowCount;
         int m = b.RowCount;
-        int d = a.ColumnCount;
 
         int p = Environment.ProcessorCount;
-        var chunks = new Matrix<double>[p];
-        for (int i = 0; i < p; i++)
-        {
-            int chunkSize = n / p;
-            int remainder = n % p;
-            int start = i * chunkSize;
-            int end = (i == p - 1) ? start + chunkSize + remainder : start + chunkSize;
-            chunks[i] = a.SubMatrix(start, end - start, 0, d);
-        }
+        var chunks = ChunkMatrix(a, p);
 
         var results = new Matrix<double>[p];
         Parallel.For(0, p, i =>
@@ -79,5 +71,20 @@ public static class Extensions
         });
 
         return term3;
+    }
+
+    public static Matrix<double>[] ChunkMatrix(this Matrix<double> matrix, int chunksCount)
+    {
+        var chunks = new Matrix<double>[chunksCount];
+        for (int i = 0; i < chunksCount; i++)
+        {
+            int chunkSize = matrix.RowCount / chunksCount;
+            int remainder = matrix.RowCount % chunksCount;
+            int start = i * chunkSize;
+            int end = (i == chunksCount - 1) ? start + chunkSize + remainder : start + chunkSize;
+            chunks[i] = matrix.SubMatrix(start, end - start, 0, matrix.ColumnCount);
+        }
+
+        return chunks;
     }
 }

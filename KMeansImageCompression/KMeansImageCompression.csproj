@@ -15,16 +15,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Data\ex7_X.npy">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\OriginalImage.jpeg">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <Page Include="App.xaml" />
   </ItemGroup>
 
   <ItemGroup>
-    <Page Include="App.xaml" />
+    <None Update="Data\1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
