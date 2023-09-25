@@ -24,10 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="TestData\1\Compressed.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="TestData\1\Original.jpeg">
+    <None Update="TestData\1.jpeg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

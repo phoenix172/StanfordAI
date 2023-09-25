@@ -44,14 +44,10 @@ public class CompressedImage
     {
         IterationResult result = KMeansIteration(_centroids);
 
-        var stopwatch = Stopwatch.StartNew();
         for (int i = 0; i < iterations; i++)
         {
             result = KMeansIteration(result);
         }
-        stopwatch.Stop();
-
-        Debug.WriteLine($"K-Means took {stopwatch.ElapsedMilliseconds} ms for {iterations} iterations with {ColorsCount} centroids");
 
         var compressedImage = result.ToMatrix().ToBitmapImage(_imageSource);
 
@@ -105,13 +101,22 @@ public class CompressedImage
 
     public Matrix<double> ComputeCentroids(Matrix<double> pixels, uint[] closestCentroidIndices)
     {
-        var kMeansEnumerable = pixels.EnumerateRowsIndexed()
-            .GroupBy(pixel => closestCentroidIndices[pixel.Item1], x => x.Item2)
-            .Select(Matrix<double>.Build.DenseOfRowVectors)
-            .Select(cluster => cluster.ColumnSums().Divide(cluster.RowCount));
+        int k = ColorsCount;
+        int d = pixels.ColumnCount;
+        var sums = new double[k, d];
+        var counts = new int[k];
 
-        var kMeans = Matrix<double>.Build.DenseOfRowVectors(kMeansEnumerable);
+        for (int i = 0; i < pixels.RowCount; i++)
+        {
+            var clusterIndex = closestCentroidIndices[i];
+            for (int j = 0; j < d; j++)
+            {
+                sums[clusterIndex, j] += pixels[i, j];
+            }
+            counts[clusterIndex]++;
+        }
+        var centroids = Matrix<double>.Build.Dense(k, d, (i, j) => counts[i] > 0 ? sums[i, j] / counts[i] : 0);
 
-        return kMeans;
+        return centroids;
     }
 }
