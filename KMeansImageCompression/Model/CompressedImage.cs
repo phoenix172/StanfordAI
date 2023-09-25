@@ -35,19 +35,23 @@ public class CompressedImage
 
         var pixels = _imageSource.To24BitFormat().GetPixels();
         _pixelMatrix = pixels.ToMatrix();
-        _centroids = CreateCentroidMatrix(_pixelMatrix, CentroidsCount);
+        _centroids = CreateCentroidMatrix(_pixelMatrix, ColorsCount);
     }
 
-    public int CentroidsCount { get; init; } = 16;
+    public int ColorsCount { get; init; } = 16;
 
-    public BitmapSource CompressImage()
+    public BitmapSource CompressImage(int iterations = 3)
     {
         IterationResult result = KMeansIteration(_centroids);
 
-        for (int i = 0; i < 3; i++)
+        var stopwatch = Stopwatch.StartNew();
+        for (int i = 0; i < iterations; i++)
         {
             result = KMeansIteration(result);
         }
+        stopwatch.Stop();
+
+        Debug.WriteLine($"K-Means took {stopwatch.ElapsedMilliseconds} ms for {iterations} iterations with {ColorsCount} centroids");
 
         var compressedImage = result.ToMatrix().ToBitmapImage(_imageSource);
 
@@ -89,15 +93,7 @@ public class CompressedImage
 
     public uint[] FindClosestCentroids(Matrix<double> pixelMatrix, Matrix<double> centroidMatrix)
     {
-        //Matrix<Centroid(K) by Pixel(n=s*s)>
-        /*Matrix<double> centroidDistanceMatrix = Matrix<double>.Build.DenseOfRowVectors
-        (
-        centroidMatrix
-                .EnumerateRows()
-                .Select(centroid => Extensions.DistanceToCentroid(pixelMatrix, centroid))
-        );*/
         Matrix<double> centroidDistanceMatrix = Extensions.CalculateEuclideanDistances(pixelMatrix, centroidMatrix);
-
 
         var closestCentroids = centroidDistanceMatrix
             .EnumerateRows()

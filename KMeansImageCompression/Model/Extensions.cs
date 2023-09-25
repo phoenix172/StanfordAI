@@ -38,12 +38,12 @@ public static class Extensions
 
         var term1 = nUnitVector.OuterProduct(bSquared);
         var term2 = aSquared.OuterProduct(mUnitVector);
-        var term3 = 2 * a * b.Transpose();
+        var term3 = 2 * a.TransposeAndMultiply(b);
 
         var squaredDistanceMatrix = term1 + term2 - term3;
 
-        var euclideanDistanceMatrix = squaredDistanceMatrix.PointwiseSqrt();
+        //var euclideanDistanceMatrix = squaredDistanceMatrix.PointwiseSqrt();
 
-        return euclideanDistanceMatrix;
+        return squaredDistanceMatrix;
     }
 }

@@ -29,7 +29,7 @@ public partial class MainViewModel
     public void CompressImage()
     {
         var a = new CompressedImage(OriginalImage);
-        CompressedImage = a.CompressImage();
+        CompressedImage = a.CompressImage(24);
 
         CompressedImage.SaveToFile("compressed.png");
     }
