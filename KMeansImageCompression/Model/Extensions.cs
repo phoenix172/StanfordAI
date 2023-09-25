@@ -74,7 +74,7 @@ public static class Extensions
 
         var term3 = Matrix<double>.Build.Dense(n, m, (i, j) =>
         {
-            int chunkIndex = i / (n / p);
+            int chunkIndex = Math.Min(i / (n / p), results.Length-1);
             return results[chunkIndex].At(i - chunkIndex * (n / p), j);
         });
 

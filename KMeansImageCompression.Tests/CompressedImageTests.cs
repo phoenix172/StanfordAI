@@ -2,12 +2,15 @@ using Codeuctivity.ImageSharpCompare;
 using KMeansImageCompression.Data;
 using KMeansImageCompression.Model;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace KMeansImageCompression.Tests
 {
     public class CompressedImageTests
     {
         private const string ResultsFolder = "CompressionTestResults";
+        private const string TestDataFolder = "TestData";
+        
         [OneTimeSetUp]
         public void SetUp()
         {
@@ -16,22 +19,36 @@ namespace KMeansImageCompression.Tests
             Directory.CreateDirectory(ResultsFolder);
         }
 
-        [TestCase("TestData/1.jpeg")]
-        [TestCase("TestData/2.jpeg")]
-        [TestCase("TestData/3.jpeg")]
-        [TestCase("TestData/4.jpeg")]
+        //[TestCase("TestData/1.jpeg")]
+        //[TestCase("TestData/2.jpeg")]
+        //[TestCase("TestData/3.jpeg")]
+        //[TestCase("TestData/4.jpeg")]
+        [TestCaseSource(nameof(GetTestImages))]
         public async Task Compress_TestImage_CompressedImage_MatchesExpectedResult(string testImage)
         {
-            CompressedImage compression = new CompressedImage(testImage, new()
+            var options = new ImageCompressionOptions()
             {
                 IterationsCount = 24,
                 TargetColorsCount = 16
-            });
+            };
+
+            CompressedImage compression = new CompressedImage(testImage, options);
             var compressed = await compression.CompressImageAsync();
 
+            AssertCloseToOriginal(testImage, compressed);
+        }
+
+        public static IEnumerable<string> GetTestImages()
+        {
+            return Directory.GetFiles(TestDataFolder);
+        }
+
+        private static void AssertCloseToOriginal(string testImage, BitmapSource compressed)
+        {
             var resultFileName = GetResultFileName();
             compressed.SaveToFile(resultFileName);
-            ImageSharpCompare.ImagesAreEqual(resultFileName, testImage);
+            var result = ImageSharpCompare.CalcDiff(resultFileName, testImage);
+            Assert.LessOrEqual(result.MeanError, 50);
         }
 
         private static string GetResultFileName()
