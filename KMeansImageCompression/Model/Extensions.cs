@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using KMeansImageCompression.Data;
 using MathNet.Numerics.LinearAlgebra;
 
@@ -38,12 +39,46 @@ public static class Extensions
 
         var term1 = nUnitVector.OuterProduct(bSquared);
         var term2 = aSquared.OuterProduct(mUnitVector);
-        var term3 = 2 * a.TransposeAndMultiply(b);
+
+        var term3 = ParallelTransposeAndMultiply(a, b);
+        //var term3 = 2 * a.TransposeAndMultiply(b);
 
         var squaredDistanceMatrix = term1 + term2 - term3;
 
-        //var euclideanDistanceMatrix = squaredDistanceMatrix.PointwiseSqrt();
-
         return squaredDistanceMatrix;
+    }
+
+    public static Matrix<double> ParallelTransposeAndMultiply(Matrix<double> a, Matrix<double> b)
+    {
+        int n = a.RowCount;
+        int m = b.RowCount;
+        int d = a.ColumnCount;
+
+        int p = Environment.ProcessorCount;
+        var chunks = new Matrix<double>[p];
+        for (int i = 0; i < p; i++)
+        {
+            int chunkSize = n / p;
+            int remainder = n % p;
+            int start = i * chunkSize;
+            int end = (i == p - 1) ? start + chunkSize + remainder : start + chunkSize;
+            chunks[i] = a.SubMatrix(start, end - start, 0, d);
+        }
+
+        // Perform the TransposeAndMultiply operation on each chunk concurrently.
+        var results = new Matrix<double>[p];
+        Parallel.For(0, p, i =>
+        {
+            results[i] = 2 * chunks[i].TransposeAndMultiply(b);
+        });
+
+        // Combine the results.
+        var term3 = Matrix<double>.Build.Dense(n, m, (i, j) =>
+        {
+            int chunkIndex = i / (n / p);
+            return results[chunkIndex].At(i - chunkIndex * (n / p), j);
+        });
+
+        return term3;
     }
 }
