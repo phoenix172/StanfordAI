@@ -50,7 +50,7 @@ public partial class MainViewModel
 
         SaveFileDialog fileDialog = new SaveFileDialog()
         {
-            Filter = $"JPEG Image | *{Constants.OutputImageFileExtension}"
+            Filter = $"Image | *{Constants.OutputImageFileExtension}"
         };
         if (fileDialog.ShowDialog() == true)
         {
