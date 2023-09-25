@@ -12,6 +12,10 @@
     <StackPanel>
         <StackPanel Orientation="Horizontal">
             <Button Command="{Binding CompressImageCommand}">Compress</Button>
+            <Label>Colors:</Label>
+            <TextBox Text="{Binding Colors}" Width="40" TextAlignment="Center" VerticalContentAlignment="Center" FontSize="19"/>
+            <Label>Iterations:</Label>
+            <TextBox Text="{Binding Iterations}" Width="40" TextAlignment="Center" VerticalContentAlignment="Center" FontSize="19"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <StackPanel Margin="10">

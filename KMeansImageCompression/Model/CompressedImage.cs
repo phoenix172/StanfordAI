@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using KMeansImageCompression.Data;
@@ -13,41 +15,50 @@ using NumSharp;
 
 namespace KMeansImageCompression.Model;
 
+public record ImageCompressionOptions(int TargetColorsCount = 16, int IterationsCount = 24);
 public class CompressedImage
 {
     private readonly Matrix<double> _pixelMatrix;
     private readonly Matrix<double> _centroids;
     private readonly BitmapSource _imageSource;
+    private readonly ImageCompressionOptions _options;
 
-    public CompressedImage(string path)
-        : this(new Uri(Path.Combine(Directory.GetCurrentDirectory(), path)))
+    public CompressedImage(string path, ImageCompressionOptions? options = null)
+        : this(new Uri(Path.Combine(Directory.GetCurrentDirectory(), path)), options)
     {
     }
 
-    public CompressedImage(Uri uri)
-        : this(new BitmapImage(uri))
+    public CompressedImage(Uri uri, ImageCompressionOptions? options = null)
+        : this(new BitmapImage(uri), options)
     {
     }
 
-    public CompressedImage(BitmapSource bitmapSource)
+    public CompressedImage(BitmapSource bitmapSource, ImageCompressionOptions? options= null)
     {
         _imageSource = bitmapSource;
+        _options = options ?? new();
+
+        bitmapSource.Freeze();
 
         var pixels = _imageSource.To24BitFormat().GetPixels();
         _pixelMatrix = pixels.ToMatrix();
-        _centroids = CreateCentroidMatrix(_pixelMatrix, ColorsCount);
+        _centroids = CreateCentroidMatrix(_pixelMatrix, _options.TargetColorsCount);
     }
 
-    public int ColorsCount { get; init; } = 16;
-
-    public BitmapSource CompressImage(int iterations = 3)
+    public async Task<BitmapSource> CompressImageAsync()
     {
-        IterationResult result = KMeansIteration(_centroids);
+        var result = await Task.Run(() =>
+            {
+                IterationResult result = KMeansIteration(_centroids);
 
-        for (int i = 0; i < iterations; i++)
-        {
-            result = KMeansIteration(result);
-        }
+                for (int i = 0; i < _options.IterationsCount; i++)
+                {
+                    result = KMeansIteration(result);
+                }
+
+                return result;
+            }
+        );
 
         var compressedImage = result.ToMatrix().ToBitmapImage(_imageSource);
 
@@ -94,6 +105,7 @@ public class CompressedImage
         var closestCentroids = centroidDistanceMatrix
             .EnumerateRows()
             .Select(pixelDistancesColumn => (uint)pixelDistancesColumn.MinimumIndex())
+            //.Select(x=>(uint)Math.Min(centroidMatrix.RowCount, (uint)x))
             .ToArray();
 
         return closestCentroids;
@@ -101,7 +113,7 @@ public class CompressedImage
 
     public Matrix<double> ComputeCentroids(Matrix<double> pixels, uint[] closestCentroidIndices)
     {
-        int k = ColorsCount;
+        int k = _options.TargetColorsCount;
         int d = pixels.ColumnCount;
         var sums = new double[k, d];
         var counts = new int[k];

@@ -1,18 +1,43 @@
 using Codeuctivity.ImageSharpCompare;
 using KMeansImageCompression.Data;
 using KMeansImageCompression.Model;
+using System.Windows.Media;
 
 namespace KMeansImageCompression.Tests
 {
     public class CompressedImageTests
     {
-        [Test]
-        public void Compress_TestImage_CompressedImage_MatchesExpectedResult()
+        private const string ResultsFolder = "CompressionTestResults";
+        [OneTimeSetUp]
+        public void SetUp()
         {
-            CompressedImage compression = new CompressedImage("TestData/1.jpeg");
-            var compressed = compression.CompressImage(24);
-            compressed.SaveToFile("result.png");
-            ImageSharpCompare.ImagesAreEqual("result.png", "TestData/1.jpeg");
+            if (Directory.Exists(ResultsFolder))
+                Directory.Delete(ResultsFolder, true);
+            Directory.CreateDirectory(ResultsFolder);
+        }
+
+        [TestCase("TestData/1.jpeg")]
+        [TestCase("TestData/2.jpeg")]
+        [TestCase("TestData/3.jpeg")]
+        [TestCase("TestData/4.jpeg")]
+        public async Task Compress_TestImage_CompressedImage_MatchesExpectedResult(string testImage)
+        {
+            CompressedImage compression = new CompressedImage(testImage, new()
+            {
+                IterationsCount = 24,
+                TargetColorsCount = 16
+            });
+            var compressed = await compression.CompressImageAsync();
+
+            var resultFileName = GetResultFileName();
+            compressed.SaveToFile(resultFileName);
+            ImageSharpCompare.ImagesAreEqual(resultFileName, testImage);
+        }
+
+        private static string GetResultFileName()
+        {
+            var resultFileName = Path.Combine(ResultsFolder, Guid.NewGuid() + ".png");
+            return resultFileName;
         }
     }
 }

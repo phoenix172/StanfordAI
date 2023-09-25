@@ -49,6 +49,8 @@ public static class Extensions
 
     public static Matrix<double> ParallelTransposeAndMultiply(Matrix<double> a, Matrix<double> b)
     {
+        var bTransposed = b.Transpose();
+
         int n = a.RowCount;
         int m = b.RowCount;
         int d = a.ColumnCount;
@@ -67,7 +69,7 @@ public static class Extensions
         var results = new Matrix<double>[p];
         Parallel.For(0, p, i =>
         {
-            results[i] = 2 * chunks[i].TransposeAndMultiply(b);
+            results[i] = 2 * chunks[i].Multiply(bTransposed);
         });
 
         var term3 = Matrix<double>.Build.Dense(n, m, (i, j) =>

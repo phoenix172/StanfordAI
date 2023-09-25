@@ -1,4 +1,5 @@
-﻿using System.Windows.Media;
+﻿using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -11,6 +12,9 @@ namespace KMeansImageCompression;
 public partial class MainViewModel
 {
     [ObservableProperty] private BitmapSource _compressedImage;
+    [ObservableProperty] private int _iterations = 24;
+    [ObservableProperty] private int _colors = 16;
+
 
     public MainViewModel()
         : this(TestData.OriginalImage.To24BitFormat())
@@ -25,11 +29,15 @@ public partial class MainViewModel
 
     public BitmapSource OriginalImage { get; }
 
-    [RelayCommand]
-    public void CompressImage()
+    [RelayCommand(AllowConcurrentExecutions = false)]
+    public async Task CompressImage()
     {
-        var a = new CompressedImage(OriginalImage);
-        CompressedImage = a.CompressImage(24);
+        var a = new CompressedImage(OriginalImage,new()
+        {
+            IterationsCount = Iterations,
+            TargetColorsCount = Colors
+        });
+        CompressedImage = await a.CompressImageAsync();
 
         CompressedImage.SaveToFile("compressed.png");
     }
