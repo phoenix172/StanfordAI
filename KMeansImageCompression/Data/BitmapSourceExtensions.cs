@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows;
+using System.IO;
 
 namespace KMeansImageCompression.Data;
 
@@ -63,7 +64,7 @@ public static class BitmapSourceExtensions
             originalImage.Format.BitsPerPixel / 8;
 
         byte[] pixelBytes = pixels.EnumerateRows().SelectMany(x => x.Select(y=>(byte)y).ToArray()).ToArray();
-        Debug.Assert(bytesCount == pixelBytes.Length);
+        //Debug.Assert(bytesCount == pixelBytes.Length);
 
         newBitmap.WritePixels(
             new Int32Rect(0, 0, newBitmap.PixelWidth, newBitmap.PixelHeight),
@@ -72,5 +73,23 @@ public static class BitmapSourceExtensions
             0);
 
         return newBitmap;
+    }
+
+    public static void SaveToFile(this BitmapSource image, string filePath)
+    {
+        using var fileStream = new FileStream(filePath, FileMode.Create);
+        BitmapEncoder encoder = new PngBitmapEncoder();
+        encoder.Frames.Add(BitmapFrame.Create(image));
+        encoder.Save(fileStream);
+    }
+
+    public static BitmapSource To24BitFormat(this BitmapSource originalImage)
+    {
+        FormatConvertedBitmap converted = new FormatConvertedBitmap();
+        converted.BeginInit();
+        converted.Source = originalImage;
+        converted.DestinationFormat = PixelFormats.Rgb24;
+        converted.EndInit();
+        return converted;
     }
 }

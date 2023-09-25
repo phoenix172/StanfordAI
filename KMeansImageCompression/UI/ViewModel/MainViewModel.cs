@@ -10,17 +10,17 @@ namespace KMeansImageCompression;
 [ObservableObject]
 public partial class MainViewModel
 {
-    [ObservableProperty]private BitmapSource _compressedImage;
+    [ObservableProperty] private BitmapSource _compressedImage;
 
     public MainViewModel()
-        : this(TestData.Get24BitOriginalImage(), TestData.Get24BitOriginalImage())
+        : this(TestData.OriginalImage.To24BitFormat())
     {
     }
 
-    public MainViewModel(BitmapSource originalImage, BitmapSource compressedImage)
+    public MainViewModel(BitmapSource image)
     {
-        OriginalImage = originalImage;
-        _compressedImage = compressedImage;
+        OriginalImage = image;
+        _compressedImage = image;
     }
 
     public BitmapSource OriginalImage { get; }
@@ -28,9 +28,9 @@ public partial class MainViewModel
     [RelayCommand]
     public void CompressImage()
     {
-        var a = new ImageCompressorService();
-        CompressedImage = a.CompressImage(OriginalImage);
-    }
+        var a = new CompressedImage(OriginalImage);
+        CompressedImage = a.CompressImage();
 
-    
+        CompressedImage.SaveToFile("compressed.png");
+    }
 }

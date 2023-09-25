@@ -9,7 +9,7 @@ public static class TestData
     public static BitmapImage OriginalImage =
             new(new Uri(Environment.CurrentDirectory + "/Data/OriginalImage.jpeg"));
 
-    public static BitmapSource Get24BitOriginalImage()
+    public static BitmapSource Get24BitOriginalImage(this BitmapSource originalImage)
     {
         FormatConvertedBitmap converted = new FormatConvertedBitmap();
         converted.BeginInit();
