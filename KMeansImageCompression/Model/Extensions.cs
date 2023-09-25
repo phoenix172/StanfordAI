@@ -41,7 +41,6 @@ public static class Extensions
         var term2 = aSquared.OuterProduct(mUnitVector);
 
         var term3 = ParallelTransposeAndMultiply(a, b);
-        //var term3 = 2 * a.TransposeAndMultiply(b);
 
         var squaredDistanceMatrix = term1 + term2 - term3;
 
@@ -65,14 +64,12 @@ public static class Extensions
             chunks[i] = a.SubMatrix(start, end - start, 0, d);
         }
 
-        // Perform the TransposeAndMultiply operation on each chunk concurrently.
         var results = new Matrix<double>[p];
         Parallel.For(0, p, i =>
         {
             results[i] = 2 * chunks[i].TransposeAndMultiply(b);
         });
 
-        // Combine the results.
         var term3 = Matrix<double>.Build.Dense(n, m, (i, j) =>
         {
             int chunkIndex = i / (n / p);
