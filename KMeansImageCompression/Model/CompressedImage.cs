@@ -90,15 +90,17 @@ public class CompressedImage
     public uint[] FindClosestCentroids(Matrix<double> pixelMatrix, Matrix<double> centroidMatrix)
     {
         //Matrix<Centroid(K) by Pixel(n=s*s)>
-        Matrix<double> centroidDistanceMatrix = Matrix<double>.Build.DenseOfRowVectors
+        /*Matrix<double> centroidDistanceMatrix = Matrix<double>.Build.DenseOfRowVectors
         (
         centroidMatrix
                 .EnumerateRows()
                 .Select(centroid => Extensions.DistanceToCentroid(pixelMatrix, centroid))
-        );
+        );*/
+        Matrix<double> centroidDistanceMatrix = Extensions.CalculateEuclideanDistances(pixelMatrix, centroidMatrix);
+
 
         var closestCentroids = centroidDistanceMatrix
-            .EnumerateColumns()
+            .EnumerateRows()
             .Select(pixelDistancesColumn => (uint)pixelDistancesColumn.MinimumIndex())
             .ToArray();
 
