@@ -1,4 +1,6 @@
+using AnomalyDetection.Client.Business;
 using AnomalyDetection.Client.Pages;
+using AnomalyDetection.Client.ServiceContracts;
 using AnomalyDetection.Components;
 using MudBlazor.Services;
 
@@ -15,6 +17,8 @@ namespace AnomalyDetection
                 .AddInteractiveServerComponents()
                 .AddInteractiveWebAssemblyComponents();
 
+            builder.Services.AddScoped<IAnomalyDetector, AnomalyDetector>();
+            builder.Services.AddScoped<IMatrixLoader, CsvMatrixLoader>();
             builder.Services.AddMudServices();
 
             var app = builder.Build();

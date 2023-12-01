@@ -1,4 +1,4 @@
-using AnomalyDetection.Business;
+using AnomalyDetection.Client.Business;
 using FluentAssertions;
 
 namespace AnomalyDetection.Tests
@@ -12,7 +12,7 @@ namespace AnomalyDetection.Tests
 
         public AnomalyDetectorTests()
         {
-            _detector = new();
+            _detector = new(new NumPyMatrixLoader());
             _detector.LoadFrom("Data/Part1");
         }
 
@@ -53,10 +53,7 @@ namespace AnomalyDetection.Tests
         [Test]
         public void LoadFrom_ValidationTarget_Loaded()
         {
-            AnomalyDetector detector = new AnomalyDetector();
-            detector.LoadFrom("Data/Part1");
-
-            var actual = detector.ValidationTarget;
+            var actual = _detector.ValidationTarget;
 
             actual.Take(5).Should().BeRoundedEquivalentTo([0, 0, 0, 0, 0]);
             actual.Should().HaveCount(Part1DataRowsCount);
