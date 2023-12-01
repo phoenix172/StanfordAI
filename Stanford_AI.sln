@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnomalyDetection", "Anomaly
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnomalyDetection.Client", "AnomalyDetection\AnomalyDetection.Client\AnomalyDetection.Client.csproj", "{8C290EB7-3D9A-4D1B-A9D7-801E3EEE5E2E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnomalyDetection.Tests", "AnomalyDetection.Tests\AnomalyDetection.Tests.csproj", "{D37AFAB9-5C89-4511-B524-C3FEA22EAED5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{8C290EB7-3D9A-4D1B-A9D7-801E3EEE5E2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C290EB7-3D9A-4D1B-A9D7-801E3EEE5E2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C290EB7-3D9A-4D1B-A9D7-801E3EEE5E2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D37AFAB9-5C89-4511-B524-C3FEA22EAED5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D37AFAB9-5C89-4511-B524-C3FEA22EAED5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D37AFAB9-5C89-4511-B524-C3FEA22EAED5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D37AFAB9-5C89-4511-B524-C3FEA22EAED5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
