@@ -13,9 +13,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetworks.Console", "N
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TensorflowTest", "TensorflowTest\TensorflowTest.csproj", "{FE173966-001D-4CB8-9340-E2C0D6D4BA6C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DecisionTrees", "DecisionTrees\DecisionTrees.csproj", "{B1C39440-8B3C-412C-ACB0-B716FE24D58D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DecisionTrees", "DecisionTrees\DecisionTrees.csproj", "{B1C39440-8B3C-412C-ACB0-B716FE24D58D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DecisionTrees.Tests", "DecisionTrees.Tests\DecisionTrees.Tests.csproj", "{F8325A3D-6282-4AFA-B15B-78BAE42172AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DecisionTrees.Tests", "DecisionTrees.Tests\DecisionTrees.Tests.csproj", "{F8325A3D-6282-4AFA-B15B-78BAE42172AE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KMeansImageCompression", "KMeansImageCompression\KMeansImageCompression.csproj", "{D14F1FA8-6A50-48DC-B6DE-E78B33D593DB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KMeansImageCompression.Tests", "KMeansImageCompression.Tests\KMeansImageCompression.Tests.csproj", "{1E23522A-DA0C-425A-AC97-05D90B6804F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnomalyDetection", "AnomalyDetection\AnomalyDetection\AnomalyDetection.csproj", "{A60F423A-A110-41E2-8580-A770514A0D28}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnomalyDetection.Client", "AnomalyDetection\AnomalyDetection.Client\AnomalyDetection.Client.csproj", "{8C290EB7-3D9A-4D1B-A9D7-801E3EEE5E2E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +59,22 @@ Global
 		{F8325A3D-6282-4AFA-B15B-78BAE42172AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8325A3D-6282-4AFA-B15B-78BAE42172AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8325A3D-6282-4AFA-B15B-78BAE42172AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D14F1FA8-6A50-48DC-B6DE-E78B33D593DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D14F1FA8-6A50-48DC-B6DE-E78B33D593DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D14F1FA8-6A50-48DC-B6DE-E78B33D593DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D14F1FA8-6A50-48DC-B6DE-E78B33D593DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E23522A-DA0C-425A-AC97-05D90B6804F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E23522A-DA0C-425A-AC97-05D90B6804F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E23522A-DA0C-425A-AC97-05D90B6804F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E23522A-DA0C-425A-AC97-05D90B6804F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A60F423A-A110-41E2-8580-A770514A0D28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A60F423A-A110-41E2-8580-A770514A0D28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A60F423A-A110-41E2-8580-A770514A0D28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A60F423A-A110-41E2-8580-A770514A0D28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C290EB7-3D9A-4D1B-A9D7-801E3EEE5E2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C290EB7-3D9A-4D1B-A9D7-801E3EEE5E2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C290EB7-3D9A-4D1B-A9D7-801E3EEE5E2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C290EB7-3D9A-4D1B-A9D7-801E3EEE5E2E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
