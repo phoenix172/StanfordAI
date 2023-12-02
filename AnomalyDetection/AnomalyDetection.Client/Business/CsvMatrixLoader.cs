@@ -4,17 +4,27 @@ namespace AnomalyDetection.Client.Business;
 
 public class CsvMatrixLoader : IMatrixLoader
 {
+    private readonly FileReader _fileReader;
+
+    public CsvMatrixLoader(FileReader? fileReader = null)
+    {
+        _fileReader = fileReader ?? new FileReader();
+    }
+    
     public string FileExtension => ".csv";
 
-    public Matrix<double> LoadMatrix(string dataPath)
+    public async Task<Matrix<double>> LoadMatrix(string dataPath)
     {
-        var splitData = File.ReadAllLines(dataPath).Select(x => x.Split(',').Select(double.Parse));
+        var data = await _fileReader.ReadFileLines(dataPath);
+        
+        var splitData = data.Select(x => x.Split(',').Select(double.Parse));
         var matrix = Matrix<double>.Build.DenseOfRows(splitData);
         return matrix;
     }
 
-    public Vector<double> LoadVector(string dataPath, int columnIndex = 0)
+    public async Task<Vector<double>> LoadVector(string dataPath, int columnIndex = 0)
     {
-        return LoadMatrix(dataPath).EnumerateColumns().Skip(columnIndex).First();
+        var matrix = (await LoadMatrix(dataPath));
+        return matrix.EnumerateColumns().Skip(columnIndex).First();
     }
 }

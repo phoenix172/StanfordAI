@@ -13,7 +13,12 @@ namespace AnomalyDetection.Tests
         public AnomalyDetectorTests()
         {
             _detector = new(new NumPyMatrixLoader());
-            _detector.LoadFrom("Data/Part1");
+        }
+
+        [SetUp]
+        public async Task SetUp()
+        {
+            await _detector.LoadFrom("TestData/Part1");
         }
 
         [Test]

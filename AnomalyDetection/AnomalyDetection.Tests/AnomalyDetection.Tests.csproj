@@ -18,8 +18,18 @@
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AnomalyDetection\AnomalyDetection\AnomalyDetection.csproj" />
-  </ItemGroup>
+
+	<ItemGroup>
+		<Content Include="..\Data\**\*.*">
+			<Link>TestData\%(RecursiveDir)/%(FileName)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <ProjectReference Include="..\AnomalyDetection.Client\AnomalyDetection.Client.csproj" />
+	</ItemGroup>
+
 
 </Project>
