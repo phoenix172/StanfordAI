@@ -1,9 +1,12 @@
 using AnomalyDetection.Client.Business;
+using AnomalyDetection.Client.ServiceContracts;
 using FluentAssertions;
 
 namespace AnomalyDetection.Tests
 {
-    public class AnomalyDetectorTests
+    [TestFixture(typeof(CsvMatrixLoader))]
+    [TestFixture(typeof(NumPyMatrixLoader))]
+    public class AnomalyDetectorTests<T> where T: IMatrixLoader, new()
     {
         private const int Part1DataRowsCount = 307;
         private const int Part1DataColumnsCount = 2;
@@ -12,7 +15,7 @@ namespace AnomalyDetection.Tests
 
         public AnomalyDetectorTests()
         {
-            _detector = new(new NumPyMatrixLoader());
+            _detector = new(new T());
         }
 
         [SetUp]

@@ -1,23 +1,23 @@
-﻿using MathNet.Numerics.LinearAlgebra;
+﻿using System.Runtime.CompilerServices;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace AnomalyDetection.Client.Business;
 
-public class CsvMatrixLoader : IMatrixLoader
+public class CsvMatrixLoader(FileReader fileReader) : IMatrixLoader
 {
-    private readonly FileReader _fileReader;
-
-    public CsvMatrixLoader(FileReader? fileReader = null)
+    public CsvMatrixLoader()
+        :this(new FileReader())
     {
-        _fileReader = fileReader ?? new FileReader();
     }
-    
+
     public string FileExtension => ".csv";
 
     public async Task<Matrix<double>> LoadMatrix(string dataPath)
     {
-        var data = await _fileReader.ReadFileLines(dataPath);
+        var data = await fileReader.ReadFileLines(dataPath);
         
         var splitData = data.Select(x => x.Split(',').Select(double.Parse));
+        
         var matrix = Matrix<double>.Build.DenseOfRows(splitData);
         return matrix;
     }

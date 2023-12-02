@@ -21,6 +21,7 @@ public class FileReader
             data = await File.ReadAllTextAsync(dataPath);
         }
 
-        return data.Split(Environment.NewLine);
+        var split = data.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+        return split;
     }
 }

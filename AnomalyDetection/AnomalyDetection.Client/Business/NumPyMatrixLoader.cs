@@ -21,6 +21,7 @@ public class NumPyMatrixLoader : IMatrixLoader
 
     public async Task<Matrix<double>> LoadMatrix(string dataPath)
     {
+        //np.load()
         using NDarray? npyData = np.load(dataPath);
         double[]? data = npyData.GetData<double>();
         if (npyData.shape.Dimensions.Length != 2)

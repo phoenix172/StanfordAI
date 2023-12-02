@@ -6,8 +6,11 @@ using MudBlazor.Services;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.Services.AddScoped<FileReader>();
 builder.Services.AddScoped<IAnomalyDetector, AnomalyDetector>();
 builder.Services.AddScoped<IMatrixLoader, CsvMatrixLoader>();
+//builder.Services.AddScoped<IMatrixLoader, NumPyMatrixLoader>();
+
 
 builder.Services.AddMudServices();
 

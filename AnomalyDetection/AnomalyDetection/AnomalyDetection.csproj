@@ -6,12 +6,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <ItemGroup>
+  <!--<ItemGroup>
 	  <Content Include="..\Data\**\*.*">
-		  <Link>wwwroot\Data\%(RecursiveDir)/%(FileName)%(Extension)</Link>
+		  <Link>wwwroot\Data%(RecursiveDir)/%(FileName)%(Extension)</Link>
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
-  </ItemGroup>
+  </ItemGroup>-->
 
   <ItemGroup>
     <ProjectReference Include="..\AnomalyDetection.Client\AnomalyDetection.Client.csproj" />

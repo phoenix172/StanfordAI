@@ -17,8 +17,6 @@ namespace AnomalyDetection
                 .AddInteractiveServerComponents()
                 .AddInteractiveWebAssemblyComponents();
 
-            builder.Services.AddScoped<IAnomalyDetector, AnomalyDetector>();
-            builder.Services.AddScoped<IMatrixLoader, CsvMatrixLoader>();
             builder.Services.AddMudServices();
 
             var app = builder.Build();
@@ -38,6 +36,7 @@ namespace AnomalyDetection
             app.UseHttpsRedirection();
 
             app.UseStaticFiles();
+            
             app.UseAntiforgery();
 
             app.MapRazorComponents<App>()
