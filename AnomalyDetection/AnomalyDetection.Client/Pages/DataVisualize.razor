@@ -7,6 +7,7 @@
 @using Plotly.Blazor.Traces
 @using Plotly.Blazor.Traces.ScatterLib
 @using System.Reflection
+@using System.Collections.Immutable
 
 <MyMudProviders />
 
@@ -14,28 +15,39 @@
 
 
 
-
+@if (_data != null)
+{
+    <PlotlyChart @bind-Config="_config" @bind-Layout="_layout" @bind-Data="_data" @ref="_chart"/>
+}
 
 
 
 @code {
     PlotlyChart _chart;
-    Config _config = new ();
+    Config _config = new ()
+    {
+        FillFrame = true
+    };
     Layout _layout = new ();
     // Using of the interface IList is important for the event callback!
-    IList<ITrace> data = new List<ITrace>
-    {
-        new Scatter
-        {
-            Name = "ScatterTrace",
-            Mode = ModeFlag.Lines | ModeFlag.Markers,
-            X = new List<object>{1,2,3},
-            Y = new List<object>{1,2,3}
-        }
-    };
+    IList<ITrace>? _data;
 
     protected override async Task OnInitializedAsync()
     {
         await Detector.LoadFrom("Data/Part1");
+        var columns = Detector.TrainingData.EnumerateColumns().ToImmutableArray();
+        IList<object> xColumn = columns[0].Cast<object>().ToList();
+        IList<object> yColumn = columns[1].Cast<object>().ToList();
+
+        _data = new List<ITrace>
+        {
+            new Scatter
+            {
+                Name = "ScatterTrace",
+                Mode = ModeFlag.Markers,
+                X = xColumn,
+                Y = yColumn
+            }
+        };
     }
 }
