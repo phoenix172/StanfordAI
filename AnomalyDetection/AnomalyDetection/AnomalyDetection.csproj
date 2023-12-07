@@ -9,7 +9,7 @@
 
 	<ItemGroup>
 		<Content Include="..\Data\**\*.*">
-			<Link>wwwroot\Data\%(RecursiveDir)/%(FileName)%(Extension)</Link>
+			<!--<Link>wwwroot\Data\%(RecursiveDir)/%(FileName)%(Extension)</Link>-->
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>

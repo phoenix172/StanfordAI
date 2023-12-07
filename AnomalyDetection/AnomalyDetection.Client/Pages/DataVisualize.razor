@@ -8,6 +8,7 @@
 @using Plotly.Blazor.Traces.ScatterLib
 @using System.Reflection
 @using System.Collections.Immutable
+@using Plotly.Blazor.LayoutLib
 
 <MyMudProviders />
 
@@ -23,17 +24,39 @@
 
 
 @code {
+    [CascadingParameter]
+    public MudTheme Theme { get; set; }
+    
     PlotlyChart _chart;
-    Config _config = new ()
-    {
-        FillFrame = true
-    };
-    Layout _layout = new ();
+    Config _config;
+    Layout _layout;
+    
     // Using of the interface IList is important for the event callback!
     IList<ITrace>? _data;
 
     protected override async Task OnInitializedAsync()
     {
+        _config = new ()
+        {
+            FillFrame = true,
+            Responsive = true
+        };
+        
+        _layout = new Layout
+        {
+            Title = new Title
+            {
+                Text = GetType().Name
+            },
+            // PaperBgColor = Theme.PaletteDark.Surface.ToString(),
+            // PlotBgColor = Theme.PaletteDark.Surface.ToString(),
+            Font = new Font
+            {
+                // Color = Theme.PaletteDark.TextPrimary.ToString()
+            },
+            HoverMode = HoverModeEnum.XUnified
+        };
+        
         await Detector.LoadFrom("Data/Part1");
         var columns = Detector.TrainingData.EnumerateColumns().ToImmutableArray();
         IList<object> xColumn = columns[0].Cast<object>().ToList();
@@ -43,10 +66,12 @@
         {
             new Scatter
             {
-                Name = "ScatterTrace",
+                Name = "Scatter",
                 Mode = ModeFlag.Markers,
                 X = xColumn,
-                Y = yColumn
+                Y = yColumn,
+                HoverInfo = HoverInfoFlag.X|HoverInfoFlag.Y,
+                HoverOn = HoverOnFlag.Points
             }
         };
     }

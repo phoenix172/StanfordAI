@@ -1,7 +1,7 @@
 ﻿@using AnomalyDetection.Client.Components
 @inherits LayoutComponentBase
 
-<MyMudThemeProvider />
+<MyMudThemeProvider/>
 
 <div class="page mud-layout">
 
@@ -12,22 +12,25 @@
             </div>
         </div>
 
-        <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+        <input type="checkbox" title="Navigation menu" class="navbar-toggler"/>
         <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-            <NavMenu />
+            <NavMenu/>
         </div>
 
     </div>
 
-     <main>
+    <main>
         <div class="top-row px-4">
-            <MudIconButton Icon="@Icons.Custom.Brands.MudBlazor" Style="color: white;" Link="https://mudblazor.com/" Target="_blank" />
-            <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Style="color: white;" Link="https://github.com/MudBlazor/MudBlazor/" Target="_blank" />
+            <MudIconButton Icon="@Icons.Custom.Brands.MudBlazor" Style="color: white;" Link="https://mudblazor.com/" Target="_blank"/>
+            <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Style="color: white;" Link="https://github.com/MudBlazor/MudBlazor/" Target="_blank"/>
         </div>
 
         <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="my-2 pt-2">
-            @Body
+            <CascadingValue Value="_theme">
+                @Body
+            </CascadingValue>
         </MudContainer>
+
     </main>
 </div>
 
@@ -37,3 +40,23 @@
     <a class="dismiss">🗙</a>
 </div>
 
+
+@code {
+    private MudTheme _theme = new MudTheme();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRenderAsync(firstRender);
+    }
+
+}
