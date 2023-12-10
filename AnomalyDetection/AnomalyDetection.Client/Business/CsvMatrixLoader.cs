@@ -20,11 +20,14 @@ public class CsvMatrixLoader(FileReader fileReader) : IMatrixLoader
         
         var matrix = Matrix<double>.Build.DenseOfRows(splitData);
         return matrix;
+        return new NormalMatrix(matrix).Normal;
     }
 
     public async Task<Vector<double>> LoadVector(string dataPath, int columnIndex = 0)
     {
         var matrix = (await LoadMatrix(dataPath));
-        return matrix.EnumerateColumns().Skip(columnIndex).First();
+        var result = matrix.SubMatrix(0, matrix.RowCount, 0, 1);
+        return result.Column(0);
+        return new NormalMatrix(result).Normal.Column(0);
     }
 }

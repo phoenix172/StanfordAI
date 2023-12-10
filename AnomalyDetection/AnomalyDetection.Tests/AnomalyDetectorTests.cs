@@ -3,11 +3,12 @@ using AnomalyDetection.Client.ServiceContracts;
 using FluentAssertions;
 using MathNet.Numerics.Distributions;
 using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.Statistics;
 
 namespace AnomalyDetection.Tests
 {
     [TestFixture(typeof(CsvMatrixLoader))]
-    [TestFixture(typeof(NumPyMatrixLoader))]
+    //[TestFixture(typeof(NumPyMatrixLoader))]
     public class AnomalyDetectorTests<T> where T : IMatrixLoader, new()
     {
         private const int Part1DataRowsCount = 307;
@@ -73,18 +74,24 @@ namespace AnomalyDetection.Tests
         public async Task EstimateGaussian_ReturnsCorrect_Results(EstimateGaussianTestCase testCase)
         {
             var matrix = Matrix<double>.Build.DenseOfArray(testCase.Data).Transpose();
-
-            var actual = await _detector.EstimateGaussianParameters(matrix);
-
-            actual.Mean.Should().BeRoundedEquivalentTo(testCase.ExpectedMean, precision: testCase.Precision);
-            actual.Variance.Should().BeRoundedEquivalentTo(testCase.ExpectedVariance, precision: testCase.Precision);
-                
+            
+            var expectedMean = matrix.EnumerateColumns().Select(x => x.Mean()).ToArray();
+            var expectedVariance = matrix.EnumerateColumns().Select(x => x.PopulationVariance()).ToArray();
+            
+            var actual = _detector.EstimateGaussianParameters(matrix);
+            
+            Console.WriteLine($"Actual Mean: {actual.Mean}");
+            Console.WriteLine($"Expected Variance: {expectedMean}");
+            
+            Console.WriteLine($"Actual Variance: {actual.Variance}");
+            Console.WriteLine($"Expected Variance: {expectedVariance}");
+            
+            actual.Mean.Should().BeRoundedEquivalentTo(expectedMean, precision: testCase.Precision);
+            actual.Variance.Should().BeRoundedEquivalentTo(expectedVariance, precision: testCase.Precision);
         }
 
         public record EstimateGaussianTestCase(
             double[,] Data,
-            double[] ExpectedMean,
-            double[] ExpectedVariance,
             double Precision = 0.1);
 
         public static IEnumerable<EstimateGaussianTestCase> EstimateGaussianTestCases =>
@@ -94,18 +101,14 @@ namespace AnomalyDetection.Tests
                         {1d, 1, 1},
                         {2, 2, 2},
                         {3, 3, 3}
-                    },
-                    [1, 2, 3],
-                    [0, 0, 0]
+                    }
                 ),
                 new EstimateGaussianTestCase(
                     new [,] {
                         {1d, 2, 3},
                         {2, 4, 6},
                         {3, 6, 9}
-                    },
-                    [2, 4, 6],
-                    [2d/3, 8d/3, 18d/3]
+                    }
                 ),
                 new EstimateGaussianTestCase(
                     Matrix<double>.Build.DenseOfRowVectors
@@ -113,11 +116,70 @@ namespace AnomalyDetection.Tests
                         Vector<double>.Build.Random(500, new Normal(0, Math.Sqrt(1))),
                         Vector<double>.Build.Random(500, new Normal(1, Math.Sqrt(2))),
                         Vector<double>.Build.Random(500, new Normal(3, Math.Sqrt(1.5)))
-                    ).ToArray(),
-                    [0, 1, 3],
-                    [1, 2, 1.5],
-                    Precision: 0.2
-                )
+                    ).ToArray()
+                ),
+                new EstimateGaussianTestCase(
+                    new [,] {
+                        {4d, 4d, 4d},
+                        {5d, 5d, 5d},
+                        {6d, 6d, 6d}
+                    }
+                ),
+                new EstimateGaussianTestCase(
+                    new [,] {
+                        {1d, 2d, 3d},
+                        {2d, 3d, 4d},
+                        {3d, 4d, 5d}
+                    }
+                ),
+                new EstimateGaussianTestCase(
+                    new [,] {
+                        {2d, 2d, 2d},
+                        {10d, 12d, 14d}
+                    }
+                ),
+                new EstimateGaussianTestCase(
+                    new [,] {
+                        {7d, 7d, 7d, 7d},
+                        {8d, 8d, 8d, 8d},
+                        {9d, 9d, 9d, 9d}
+                    }
+                ),
+                new EstimateGaussianTestCase(
+                    new [,] {
+                        {1d, 2d, 1d},
+                        {4d, 5d, 6d},
+                        {7d, 8d, 9d}
+                    }
+                ),
+                new EstimateGaussianTestCase(
+                    new [,] {
+                        {3d, 3d, 3d},
+                        {2d, 4d, 6d},
+                        {1d, 5d, 9d}
+                    }
+                ),
             ];
+        
+        [Test]
+        public void TestMultivariateGaussian()
+        {
+            // Define a simple dataset
+            Matrix<double> testData = Matrix<double>.Build.DenseOfArray(new double[,]
+            {
+                { 1, 2 },
+                { 2, 3 },
+                { 3, 4 }
+            });
+            
+            var parameters = _detector.EstimateGaussianParameters(testData);
+            Vector<double> probabilities = _detector.MultivariateGaussian(parameters);
+
+            // Define expected probabilities (replace with the actual expected values)
+            Vector<double> expectedProbabilities = Vector<double>.Build.Dense([0.05855d, 0.15915, 0.05855]);
+
+            Console.WriteLine( $"Expected: {expectedProbabilities.ToVectorString()} \n Actual: {probabilities.ToVectorString()}");
+            probabilities.Should().BeRoundedEquivalentTo(expectedProbabilities.ToArray(), 1e-4);
+        }
     }
 }

@@ -1,0 +1,51 @@
+﻿@using AnomalyDetection.Client.Components
+@using Plotly.Blazor
+@using Plotly.Blazor.Traces
+@using Plotly.Blazor.Traces.ScatterLib
+@using System.Reflection
+@using System.Collections.Immutable
+@using Plotly.Blazor.LayoutLib
+@using Plotly.Blazor.Traces.ScatterLib.MarkerLib
+
+<PlotlyChart @bind-Config="_config" @bind-Layout="_layout" @bind-Data="Data" @ref="_chart" />
+
+@code {
+    PlotlyChart _chart;
+    Config _config;
+    Layout _layout;
+
+    // Using of the interface IList is important for the event callback!
+
+    [Parameter]
+    public IList<ITrace>? Data { get; set; }
+
+    [Parameter] public string Title { get; set; } = "ChartComponent";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _config = new()
+        {
+            //FillFrame = true,
+            Responsive = true,
+            AutoSizable = true,
+                
+        };
+
+        _layout = new Layout
+        {
+            Title = new Title
+            {
+                Text = Title
+            },
+            //PaperBgColor = "transparent",
+            //PlotBgColor = "black",
+            Font = new Font
+            {
+                // Color = Theme.PaletteDark.TextPrimary.ToString()
+            },
+            HoverMode = HoverModeEnum.XUnified
+        };
+
+        await base.OnInitializedAsync();
+    }
+}
