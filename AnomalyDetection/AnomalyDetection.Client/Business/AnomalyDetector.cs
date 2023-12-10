@@ -34,7 +34,8 @@ public class AnomalyDetector : IAnomalyDetector
         ValidationTarget = await _loader.LoadVector(validationTargetPath);
     }
 
-    public async Task<(Vector<double> Mean, Vector<double> Variance)> EstimateGaussian(Matrix<double>? data = null)
+    
+    public async Task<GaussianParameters> EstimateGaussianParameters(Matrix<double>? data = null)
     {
         data ??= TrainingData;
         var featureSums = data.ColumnSums();
@@ -43,10 +44,32 @@ public class AnomalyDetector : IAnomalyDetector
         var repeatedMeanMatrix = mean.ToRowMatrix(data.RowCount);
         
         var variance = (data - repeatedMeanMatrix).PointwisePower(2).ColumnSums().Divide(data.RowCount);
-        return (mean, variance);
+        return new(mean, variance, data);
+    }
+
+    public Matrix<double> MultivariateGaussian(GaussianParameters parameters)
+    {
+        var data = parameters.Data;
+        int rowCount = parameters.Data.RowCount;
+        var meanRowMatrix = parameters.Mean.ToRowMatrix(rowCount);
+        var varRowMatrix = parameters.Variance.ToRowMatrix(rowCount);
+            
+        Matrix<double> exponents = 
+            (data - meanRowMatrix).PointwisePower(2)
+            .PointwiseDivide(2*varRowMatrix.PointwisePower(2));
+
+        var oneMatrix = Vector<double>.Build
+            .DenseOfEnumerable(Enumerable.Repeat(1d, data.ColumnCount))
+            .ToRowMatrix(data.RowCount);
+
+        Matrix<double> factors = oneMatrix.PointwiseDivide(2 * Math.PI * varRowMatrix.PointwisePower(2).PointwiseSqrt());
+
+        return factors.PointwiseMultiply(exponents.PointwiseExp());
     }
 
 }
+
+public record GaussianParameters(Vector<double> Mean, Vector<double> Variance, Matrix<double> Data);
 
 public static class MatrixOperations
 {

@@ -74,7 +74,7 @@ namespace AnomalyDetection.Tests
         {
             var matrix = Matrix<double>.Build.DenseOfArray(testCase.Data).Transpose();
 
-            var actual = await _detector.EstimateGaussian(matrix);
+            var actual = await _detector.EstimateGaussianParameters(matrix);
 
             actual.Mean.Should().BeRoundedEquivalentTo(testCase.ExpectedMean, precision: testCase.Precision);
             actual.Variance.Should().BeRoundedEquivalentTo(testCase.ExpectedVariance, precision: testCase.Precision);

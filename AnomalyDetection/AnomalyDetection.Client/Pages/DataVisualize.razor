@@ -20,50 +20,53 @@
 <PageTitle>Weather</PageTitle>
 
 
-
-@if (_data != null)
-{
-    <PlotlyChart @bind-Config="_config" @bind-Layout="_layout" @bind-Data="_data" @ref="_chart"/>
-}
+<MudGrid>
+    <MudItem xs="12" md="6">
+        @if (_data != null)
+        {
+            <PlotlyChart @bind-Config="_config" @bind-Layout="_layout" @bind-Data="_data" @ref="_chart" />
+        }
+    </MudItem>
+</MudGrid>
 
 
 
 @code {
     [CascadingParameter]
     public MudTheme Theme { get; set; }
-    
+
     PlotlyChart _chart;
     Config _config;
     Layout _layout;
-    
+
     // Using of the interface IList is important for the event callback!
     IList<ITrace>? _data;
 
     protected override async Task OnInitializedAsync()
     {
-        _config = new ()
-        {
-            //FillFrame = true,
-            Responsive = true,
-            AutoSizable = true,
-            
-        };
-        
+        _config = new()
+            {
+                //FillFrame = true,
+                Responsive = true,
+                AutoSizable = true,
+                
+            };
+
         _layout = new Layout
-        {
-            Title = new Title
             {
-                Text = GetType().Name
-            },
-            //PaperBgColor = "transparent",
-            //PlotBgColor = "black",
-            Font = new Font
-            {
-                // Color = Theme.PaletteDark.TextPrimary.ToString()
-            },
-            HoverMode = HoverModeEnum.XUnified
-        };
-        
+                Title = new Title
+                {
+                    Text = GetType().Name
+                },
+                //PaperBgColor = "transparent",
+                //PlotBgColor = "black",
+                Font = new Font
+                {
+                    // Color = Theme.PaletteDark.TextPrimary.ToString()
+                },
+                HoverMode = HoverModeEnum.XUnified
+            };
+
         await Detector.LoadFrom("Data/Part1");
         var columns = Detector.TrainingData.EnumerateColumns().ToImmutableArray();
         IList<object> xColumn = columns[0].Cast<object>().ToList();
