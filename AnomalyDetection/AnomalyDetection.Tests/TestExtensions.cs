@@ -5,11 +5,12 @@ namespace AnomalyDetection.Tests;
 
 public static class TestExtensions
 {
-    public static void BeRoundedEquivalentTo<T>(this GenericCollectionAssertions<T> assertion, T[] expected)
+    public static AndConstraint<GenericCollectionAssertions<T>> BeRoundedEquivalentTo<T>(this GenericCollectionAssertions<T> assertion, T[] expected, double precision = 0.01, string because = "")
     {
-        assertion.BeEquivalentTo(
+        return assertion.BeEquivalentTo(
             expected,
-            options => options.Using<double>(ctx => ctx.Subject.Should().BeApproximately(ctx.Expectation, 0.01)).WhenTypeIs<double>()
+            options => options.Using<double>(ctx => ctx.Subject.Should().BeApproximately(ctx.Expectation, precision)).WhenTypeIs<double>(),
+            because
         );
     }
 }

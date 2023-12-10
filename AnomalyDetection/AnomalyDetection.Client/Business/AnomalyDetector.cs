@@ -12,6 +12,10 @@ public class AnomalyDetector : IAnomalyDetector
     {
         _loader = loader;
     }
+    
+    public Matrix<double> TrainingData { get; set; }
+    public Matrix<double> ValidationInput { get; set; }
+    public Vector<double> ValidationTarget { get; set; }
 
     public async Task LoadFrom(string basePath, string trainingDataFileName = "train",
         string validationInputFileName = "validate_input", string validationTargetFileName = "validate_target")
@@ -30,8 +34,29 @@ public class AnomalyDetector : IAnomalyDetector
         ValidationTarget = await _loader.LoadVector(validationTargetPath);
     }
 
-    public Matrix<double> TrainingData { get; set; }
-    public Matrix<double> ValidationInput { get; set; }
-    public Vector<double> ValidationTarget { get; set; }
+    public async Task<(Vector<double> Mean, Vector<double> Variance)> EstimateGaussian(Matrix<double>? data = null)
+    {
+        data ??= TrainingData;
+        var featureSums = data.ColumnSums();
+        var mean = featureSums.Divide(data.RowCount);
 
+        var repeatedMeanMatrix = mean.ToRowMatrix(data.RowCount);
+        
+        var variance = (data - repeatedMeanMatrix).PointwisePower(2).ColumnSums().Divide(data.RowCount);
+        return (mean, variance);
+    }
+
+}
+
+public static class MatrixOperations
+{
+    public static Matrix<double> ToRowMatrix(this Vector<double> vector, int numberOfRows)
+    {
+        var matrix = Matrix<double>.Build.Dense(numberOfRows, vector.Count);
+        for (int i = 0; i < numberOfRows; i++)
+        {
+            matrix.SetRow(i, vector);
+        }
+        return matrix;
+    }
 }
