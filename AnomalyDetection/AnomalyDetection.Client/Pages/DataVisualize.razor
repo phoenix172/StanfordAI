@@ -13,7 +13,7 @@
 @using Plotly.Blazor.Traces.ContourLib.ContoursLib
 @using Plotly.Blazor.Traces.ScatterLib.MarkerLib
 @using HoverInfoFlag = Plotly.Blazor.Traces.ScatterLib.HoverInfoFlag
-@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: true))
 @inject IAnomalyDetector Detector
 
 <script src="_content/Plotly.Blazor/plotly-latest.min.js" type="text/javascript"></script>

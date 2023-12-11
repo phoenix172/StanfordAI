@@ -8,7 +8,7 @@ using MathNet.Numerics.Statistics;
 namespace AnomalyDetection.Tests
 {
     [TestFixture(typeof(CsvMatrixLoader))]
-    //[TestFixture(typeof(NumPyMatrixLoader))]
+    [TestFixture(typeof(NumPyMatrixLoader))]
     public class AnomalyDetectorTests<T> where T : IMatrixLoader, new()
     {
         private const int Part1DataRowsCount = 307;

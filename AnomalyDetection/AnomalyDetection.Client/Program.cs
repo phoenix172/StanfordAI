@@ -1,17 +1,18 @@
 using AnomalyDetection.Client.Business;
-using AnomalyDetection.Client.ServiceContracts;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
 
-var builder = WebAssemblyHostBuilder.CreateDefault(args);
+namespace AnomalyDetection.Client;
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-builder.Services.AddScoped<FileReader>();
-builder.Services.AddScoped<IAnomalyDetector, AnomalyDetector>();
-builder.Services.AddScoped<IMatrixLoader, CsvMatrixLoader>();
-//builder.Services.AddScoped<IMatrixLoader, NumPyMatrixLoader>();
+internal class Program
+{
+    public static async Task Main(string[] args)
+    {
+        var builder = WebAssemblyHostBuilder.CreateDefault(args);
+        builder.Services.RegisterServices();
 
+        builder.Services.AddMudServices();
 
-builder.Services.AddMudServices();
-
-await builder.Build().RunAsync();
+        await builder.Build().RunAsync();
+    }
+}

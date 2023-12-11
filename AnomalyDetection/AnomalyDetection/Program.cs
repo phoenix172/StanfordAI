@@ -18,8 +18,10 @@ namespace AnomalyDetection
                 .AddInteractiveWebAssemblyComponents();
 
             builder.Services.AddMudServices();
-
+            builder.Services.RegisterServices();
+            
             var app = builder.Build();
+            
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -46,5 +48,7 @@ namespace AnomalyDetection
 
             app.Run();
         }
+        
+
     }
 }
