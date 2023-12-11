@@ -1,9 +1,7 @@
-﻿using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using MathNet.Numerics.LinearAlgebra;
+﻿using MathNet.Numerics.LinearAlgebra;
 using Numpy;
 
-namespace AnomalyDetection.Client.Business;
+namespace AnomalyDetection.Core.IO;
 
 public class NumPyMatrixLoader : IMatrixLoader
 {

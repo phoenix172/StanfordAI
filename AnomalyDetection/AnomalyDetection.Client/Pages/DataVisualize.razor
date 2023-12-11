@@ -1,5 +1,4 @@
 ﻿@page "/data"
-@using AnomalyDetection.Client.ServiceContracts
 @using System.Collections.Immutable
 @using AnomalyDetection.Client.Components
 @using Plotly.Blazor
@@ -7,13 +6,14 @@
 @using Plotly.Blazor.Traces.ScatterLib
 @using System.Reflection
 @using System.Collections.Immutable
+@using AnomalyDetection.Core
 @using MathNet.Numerics.LinearAlgebra
 @using Plotly.Blazor.LayoutLib
 @using Plotly.Blazor.Traces.ContourLib
 @using Plotly.Blazor.Traces.ContourLib.ContoursLib
 @using Plotly.Blazor.Traces.ScatterLib.MarkerLib
 @using HoverInfoFlag = Plotly.Blazor.Traces.ScatterLib.HoverInfoFlag
-@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: true))
+@rendermode @(new InteractiveAutoRenderMode(prerender: true))
 @inject IAnomalyDetector Detector
 
 <script src="_content/Plotly.Blazor/plotly-latest.min.js" type="text/javascript"></script>

@@ -1,4 +1,4 @@
-using AnomalyDetection.Client.Business;
+using AnomalyDetection.Core;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
 
@@ -9,6 +9,11 @@ internal class Program
     public static async Task Main(string[] args)
     {
         var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
+
+        builder.Services
+            .AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+        
         builder.Services.RegisterServices();
 
         builder.Services.AddMudServices();

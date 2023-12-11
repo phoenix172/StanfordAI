@@ -1,6 +1,6 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
 
-namespace AnomalyDetection.Client.Business;
+namespace AnomalyDetection.Core.IO;
 
 public interface IMatrixLoader
 {

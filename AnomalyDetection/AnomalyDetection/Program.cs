@@ -1,7 +1,8 @@
-using AnomalyDetection.Client.Business;
 using AnomalyDetection.Client.Pages;
-using AnomalyDetection.Client.ServiceContracts;
 using AnomalyDetection.Components;
+using AnomalyDetection.Core;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using MudBlazor.Services;
 
 namespace AnomalyDetection
@@ -18,7 +19,9 @@ namespace AnomalyDetection
                 .AddInteractiveWebAssemblyComponents();
 
             builder.Services.AddMudServices();
-            builder.Services.RegisterServices();
+
+            builder.Services
+                .RegisterServices();
             
             var app = builder.Build();
             

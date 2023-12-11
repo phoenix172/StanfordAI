@@ -1,8 +1,8 @@
-﻿using AnomalyDetection.Client.ServiceContracts;
+﻿using AnomalyDetection.Core.IO;
+using AnomalyDetection.Core.Statistics;
 using MathNet.Numerics.LinearAlgebra;
-using static AnomalyDetection.Client.Business.CrossPlatform;
 
-namespace AnomalyDetection.Client.Business;
+namespace AnomalyDetection.Core;
 
 public class AnomalyDetector : IAnomalyDetector
 {
@@ -69,19 +69,4 @@ public class AnomalyDetector : IAnomalyDetector
         return probabilities;
     }
 
-}
-
-public record GaussianParameters(Vector<double> Mean, Vector<double> Variance, Matrix<double> Data);
-
-public static class MatrixOperations
-{
-    public static Matrix<double> ToRowMatrix(this Vector<double> vector, int numberOfRows)
-    {
-        var matrix = Matrix<double>.Build.Dense(numberOfRows, vector.Count);
-        for (int i = 0; i < numberOfRows; i++)
-        {
-            matrix.SetRow(i, vector);
-        }
-        return matrix;
-    }
 }

@@ -1,15 +1,27 @@
-using AnomalyDetection.Client.Business;
-using AnomalyDetection.Client.ServiceContracts;
+using System.Data.Common;
+using AnomalyDetection.Core;
+using AnomalyDetection.Core.IO;
 using FluentAssertions;
 using MathNet.Numerics.Distributions;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Statistics;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 
 namespace AnomalyDetection.Tests
 {
+    public record MockHostEnvironment() : IHostEnvironment
+    {
+        public string EnvironmentName { get; set; }
+        public string ApplicationName { get; set; }
+        public string ContentRootPath { get; set; } = Directory.GetCurrentDirectory();
+        public IFileProvider ContentRootFileProvider { get; set; }
+    }
+
     [TestFixture(typeof(CsvMatrixLoader))]
     [TestFixture(typeof(NumPyMatrixLoader))]
-    public class AnomalyDetectorTests<T> where T : IMatrixLoader, new()
+    public class AnomalyDetectorTests<T> where T : class, IMatrixLoader
     {
         private const int Part1DataRowsCount = 307;
         private const int Part1DataColumnsCount = 2;
@@ -18,7 +30,12 @@ namespace AnomalyDetection.Tests
 
         public AnomalyDetectorTests()
         {
-            _detector = new(new T());
+            ServiceCollection services = new ServiceCollection();
+            var provider = services.RegisterServices()
+                .AddScoped<T>()
+                .BuildServiceProvider();
+            var matrixLoader = provider.GetRequiredService<T>();
+            _detector = new AnomalyDetector(matrixLoader);
         }
 
         [SetUp]

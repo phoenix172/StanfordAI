@@ -11,6 +11,8 @@
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="8.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="NUnit" Version="4.0.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
@@ -31,7 +33,14 @@
 
 
 	<ItemGroup>
-	  <ProjectReference Include="..\AnomalyDetection.Client\AnomalyDetection.Client.csproj" />
+	  <ProjectReference Include="..\AnomalyDetection.Core\AnomalyDetection.Core.csproj" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <Reference Include="Microsoft.Extensions.Hosting.Abstractions">
+	    <HintPath>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.0\Microsoft.Extensions.Hosting.Abstractions.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 
 

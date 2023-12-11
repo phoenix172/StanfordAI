@@ -1,7 +1,7 @@
-﻿using AnomalyDetection.Client.Business;
+﻿using AnomalyDetection.Core.Statistics;
 using MathNet.Numerics.LinearAlgebra;
 
-namespace AnomalyDetection.Client.ServiceContracts;
+namespace AnomalyDetection.Core;
 
 public interface IAnomalyDetector
 {
