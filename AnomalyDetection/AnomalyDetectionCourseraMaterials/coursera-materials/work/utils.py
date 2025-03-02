@@ -46,6 +46,7 @@ def visualize_fit(X, mu, var):
     Z = multivariate_gaussian(np.stack([X1.ravel(), X2.ravel()], axis=1), mu, var)
     Z = Z.reshape(X1.shape)
 
+    plt.figure(1)
     plt.plot(X[:, 0], X[:, 1], 'bx')
 
     if np.sum(np.isinf(Z)) == 0:

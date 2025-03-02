@@ -1,8 +1,4 @@
-﻿using System.Reflection.PortableExecutable;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-
+﻿
 namespace AnomalyDetection.Core.IO;
 
 public interface IFileReader
@@ -19,12 +15,6 @@ public class FileReader : IFileReader
     {
         _client = client;
     }
-
-    public FileReader(IWebHostEnvironment environment)
-        : this(contentRootPath: environment.WebRootPath)
-    {
-    }
-
     public FileReader()
         : this(Directory.GetCurrentDirectory())
     {

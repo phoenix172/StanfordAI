@@ -1,5 +1,4 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
-using static AnomalyDetection.Core.CrossPlatform;
 
 namespace AnomalyDetection.Core.Statistics;
 

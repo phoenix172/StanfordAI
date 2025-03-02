@@ -18,7 +18,6 @@ using MultipleLinearRegressionWithGradientDescent;
 using OxyPlot;
 using OxyPlot.Annotations;
 using OxyPlot.Series;
-using ScottPlot;
 using Color = System.Drawing.Color;
 
 namespace NeuralNetworks
