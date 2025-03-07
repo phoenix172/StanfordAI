@@ -13,7 +13,8 @@ namespace AnomalyDetection
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddRazorComponents()
+            builder.Services
+                .AddRazorComponents()
                 .AddInteractiveServerComponents()
                 .AddInteractiveWebAssemblyComponents();
 
@@ -40,8 +41,9 @@ namespace AnomalyDetection
             app.UseStaticFiles();
             
             app.UseAntiforgery();
-
-            app.MapRazorComponents<App>()
+            app.MapStaticAssets();
+            app
+                .MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode()
                 .AddInteractiveWebAssemblyRenderMode()
                 .AddAdditionalAssemblies(typeof(DataVisualize).Assembly);

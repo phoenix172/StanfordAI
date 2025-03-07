@@ -11,7 +11,7 @@ public static class ServiceCollectionExtensions
             .AddScoped<IFileReader, FileReader>()
             .AddScoped<IAnomalyDetector, AnomalyDetector>()
             .AddScoped<IMatrixLoader, CsvMatrixLoader>();
-        //.AddScoped<IMatrixLoader, NumPyMatrixLoader>();
+        
         return services;
     }
 }
