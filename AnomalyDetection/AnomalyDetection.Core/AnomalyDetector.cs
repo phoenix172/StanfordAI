@@ -50,27 +50,14 @@ public class AnomalyDetector : IAnomalyDetector
     public Vector<double> MultivariateGaussian(GaussianParameters parameters)
     {
         var data = parameters.Data;
-        int rowCount = parameters.Data.RowCount;
-        int columnCount = parameters.Data.ColumnCount;
-        var meanRowMatrix = parameters.Mean.ToRowMatrix(rowCount);
-        var varRowMatrix = parameters.Variance.ToRowMatrix(rowCount);
+        var meanRowMatrix = parameters.Mean.ToRowMatrix(parameters.Data.RowCount);
         var varianceMatrix = Matrix<double>.Build.DiagonalOfDiagonalVector(parameters.Variance);
 
-        var diffMatrix = (data - meanRowMatrix);
+        var diffMatrix = data - meanRowMatrix;
         Vector<double> exponents =
             -0.5*(diffMatrix * varianceMatrix.PseudoInverse() * diffMatrix.Transpose()).Diagonal();
 
-        var oneMatrix = Matrix<double>.Build.Dense(rowCount, data.ColumnCount, 1);
-
-        var factor = Math.Pow(2 * Math.PI, 0.5 * columnCount) * Math.Sqrt(varianceMatrix.Determinant());
+        var factor = Math.Pow(2 * Math.PI, 0.5 * parameters.Data.ColumnCount) * Math.Sqrt(varianceMatrix.Determinant());
         return (1 / factor) * exponents.PointwiseExp();
-        // Matrix<double> factors = oneMatrix.PointwiseDivide(2 * Math.PI * varRowMatrix.PointwiseSqrt());
-        //
-        // var probabilityMatrix = factors.PointwiseMultiply(exponents.PointwiseExp());
-        //
-        // var probabilities = probabilityMatrix.RowSums();
-        //
-        // return probabilities;
     }
-
 }

@@ -7,28 +7,34 @@
 @using Plotly.Blazor.LayoutLib
 @using Plotly.Blazor.Traces.ScatterLib.MarkerLib
 
-<PlotlyChart @bind-Config="_config" @bind-Layout="_layout" @bind-Data="Data" @ref="_chart" />
+<div style="width: @Width ; height: @Height">
+    <PlotlyChart @bind-Config="_config" @bind-Layout="_layout" @bind-Data="Data" @ref="_chart" />
+</div>
 
 @code {
     PlotlyChart _chart;
     Config _config;
     Layout _layout;
 
-    // Using of the interface IList is important for the event callback!
-
     [Parameter]
     public IList<ITrace>? Data { get; set; }
 
-    [Parameter] public string Title { get; set; } = "ChartComponent";
+    [Parameter] 
+    public decimal? Width { get; set; } = 600;
+
+    [Parameter]
+    public decimal? Height { get; set; } = 600;
+
+    [Parameter] 
+    public string Title { get; set; } = "ChartComponent";
 
     protected override async Task OnInitializedAsync()
     {
         _config = new()
         {
-            //FillFrame = true,
+            FillFrame = false,
             Responsive = true,
-            AutoSizable = true,
-                
+            AutoSizable = false
         };
 
         _layout = new Layout
@@ -37,6 +43,8 @@
             {
                 Text = Title
             },
+            Width = Width,
+            Height = Height,
             //PaperBgColor = "transparent",
             //PlotBgColor = "black",
             Font = new Font
