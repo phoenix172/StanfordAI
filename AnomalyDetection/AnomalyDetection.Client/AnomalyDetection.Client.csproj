@@ -11,6 +11,7 @@
 	<ItemGroup>
 		<PackageReference Include="MathNet.Numerics" Version="5.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.2" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.2" />
 		<PackageReference Include="MudBlazor" Version="8.3.0" />
 		<PackageReference Include="Numpy" Version="3.11.1.34" />
 		<PackageReference Include="Plotly.Blazor" Version="6.0.1" />
@@ -30,6 +31,12 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\AnomalyDetection.Core\AnomalyDetection.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="Microsoft.AspNetCore.Hosting.Abstractions">
+	    <HintPath>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\9.0.0\Microsoft.AspNetCore.Hosting.Abstractions.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 
 </Project>

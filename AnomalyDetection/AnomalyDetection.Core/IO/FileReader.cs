@@ -15,14 +15,10 @@ public class FileReader : IFileReader
     {
         _client = client;
     }
-    public FileReader()
-        : this(Directory.GetCurrentDirectory())
-    {
-    }
 
-    public FileReader(string contentRootPath)
+    public FileReader(DataConfiguration dataConfiguration)
     {
-        _contentRootPath = contentRootPath;
+        _contentRootPath = dataConfiguration.TestDataRoot;
     }
 
     public async Task<string[]> ReadFileLines(string dataPath)

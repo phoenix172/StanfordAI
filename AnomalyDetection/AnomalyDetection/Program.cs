@@ -21,7 +21,8 @@ namespace AnomalyDetection
             builder.Services.AddMudServices();
 
             builder.Services
-                .RegisterServices();
+                .AddScoped<DataConfiguration>(svc => new(svc.GetRequiredService<IWebHostEnvironment>().WebRootPath))
+                .RegisterAnomalyDetection();
             
             var app = builder.Build();
             

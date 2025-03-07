@@ -1,5 +1,6 @@
 using AnomalyDetection.Core;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using MudBlazor.Services;
 
 namespace AnomalyDetection.Client;
@@ -13,8 +14,9 @@ internal class Program
 
         builder.Services
             .AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-        
-        builder.Services.RegisterServices();
+        builder.Services.AddScoped<DataConfiguration>(svc =>
+            new DataConfiguration(svc.GetRequiredService<IWebHostEnvironment>().WebRootPath));
+        builder.Services.RegisterAnomalyDetection();
 
         builder.Services.AddMudServices();
 

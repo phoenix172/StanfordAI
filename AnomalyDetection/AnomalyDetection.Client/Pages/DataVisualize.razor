@@ -24,6 +24,8 @@
         @if (_loaded)
         {
             <ChartComponent Data="_trainingScatter" Title="Training Data Scatter Plot" />
+            <ChartComponent Data="_featurePlotX" Title="X Feature Plot" />
+            <ChartComponent Data="_featurePlotY" Title="Y Feature Plot" />
             <ChartComponent Data="_contourPlot" Title="Gaussian Distribution Probability Levels Contour Plot" />
         }
     </MudItem>
@@ -35,6 +37,8 @@
     private List<ITrace>? _trainingScatter;
     private List<ITrace>? _contourPlot;
     private bool _loaded = false;
+    private List<ITrace>? _featurePlotX;
+    private List<ITrace>? _featurePlotY;
 
 
     protected override async Task OnInitializedAsync()
@@ -44,6 +48,8 @@
         _trainingScatter = [MakeTrainingScatter()];
 
         _contourPlot = [_trainingScatter[0], MakeContourPlot()];
+        _featurePlotX = [MakeFeatureHistogram(Detector.TrainingData.EnumerateColumns().First())];
+        _featurePlotY = [MakeFeatureHistogram(Detector.TrainingData.EnumerateColumns().Last())];
         _loaded = true;
         await base.OnInitializedAsync();
     }
@@ -75,6 +81,16 @@
         };
 
         return contour;
+    }
+
+    private Histogram MakeFeatureHistogram(Vector<double> feature)
+    {
+        var column = feature.Cast<object>().ToList();
+        return new Histogram
+        {
+            X = column,
+            HoverInfo = Plotly.Blazor.Traces.HistogramLib.HoverInfoFlag.All
+        };
     }
 
     private Scatter MakeTrainingScatter()
